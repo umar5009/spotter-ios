@@ -1,0 +1,337 @@
+import SwiftUI
+import QuartzCore
+
+struct Cue: Equatable {
+    enum Kind { case good, warn, info }
+    let text: String
+    let kind: Kind
+}
+
+struct SetResult: Identifiable {
+    let id = UUID()
+    let exerciseID: String
+    let exerciseName: String
+    let setNumber: Int
+    let reps: Int
+    let holdSeconds: Int
+    let avgScore: Int
+    let faults: [String: Int]
+    let weightKg: Double
+
+    var topFault: String? { faults.max { $0.value < $1.value }?.key }
+}
+
+/// Drives a live workout: framing check → countdown → coached set → rest → next set/exercise.
+final class TrainerSession: ObservableObject {
+    enum Stage: Equatable {
+        case framing
+        case countdown(Int)
+        case active
+        case resting(Int)
+        case exerciseDone
+        case finished
+    }
+
+    @Published private(set) var stage: Stage = .framing
+    @Published private(set) var index = 0
+    @Published private(set) var setNumber = 1
+    @Published private(set) var repCount = 0
+    @Published private(set) var holdSeconds: Double = 0
+    @Published private(set) var lastRepScore: Int?
+    @Published private(set) var progress: Double = 0
+    @Published private(set) var cue: Cue?
+    @Published private(set) var faultJoints: Set<Joint> = []
+    @Published private(set) var inFrame = false
+    @Published private(set) var results: [SetResult] = []
+    @Published var weightKg: Double
+
+    let plan: [PlannedExercise]
+    let title: String
+    let sessionID = UUID()
+    let startedAt = Date()
+
+    private var analyzer: ExerciseAnalyzer
+    private var repScores: [Int] = []
+    private var faultCounts: [String: Int] = [:]
+    private var inFrameSince: TimeInterval?
+    private var outOfFrameSince: TimeInterval?
+    private var timer: Timer?
+    private var cueClear: DispatchWorkItem?
+    private var perfectStreak = 0
+    private var lastHoldAnnouncement = 0
+    private let voice = VoiceCoach.shared
+
+    var current: PlannedExercise { plan[index] }
+    var spec: ExerciseSpec { ExerciseLibrary.spec(current.exerciseID) }
+    var target: Int { current.target }
+    var isHold: Bool { spec.kind.isHold }
+    var nextSpec: ExerciseSpec? { index + 1 < plan.count ? ExerciseLibrary.spec(plan[index + 1].exerciseID) : nil }
+    var currentExerciseResults: [SetResult] { results.filter { $0.exerciseID == current.exerciseID } }
+
+    init(plan: [PlannedExercise], title: String) {
+        precondition(!plan.isEmpty, "A workout needs at least one exercise")
+        self.plan = plan
+        self.title = title
+        self.analyzer = ExerciseAnalyzer(spec: ExerciseLibrary.spec(plan[0].exerciseID))
+        self.weightKg = plan[0].weightKg ?? 0
+    }
+
+    func begin() {
+        voice.say(String(localized: "Let's set up. \(spec.camera.instruction)"), key: "setup", cooldown: 0, priority: true)
+    }
+
+    // MARK: - Frame handling
+
+    func handle(_ pose: Pose?) {
+        let now = CACurrentMediaTime()
+        let framed = pose.map { self.isFramed($0) } ?? false
+        if inFrame != framed { inFrame = framed }
+
+        switch stage {
+        case .framing:
+            if framed {
+                if inFrameSince == nil { inFrameSince = now }
+                if let since = inFrameSince, now - since > 1.0 { startCountdown() }
+            } else {
+                inFrameSince = nil
+            }
+
+        case .active:
+            guard let pose else {
+                setFaultJoints([])
+                return
+            }
+            if framed {
+                outOfFrameSince = nil
+            } else {
+                if outOfFrameSince == nil { outOfFrameSince = now }
+                if let since = outOfFrameSince, now - since > 1.2 {
+                    let cue = String(localized: "Step back so I can see your whole body")
+                    show(Cue(text: cue, kind: .info))
+                    voice.say(cue, key: "frame", cooldown: 8)
+                }
+            }
+
+            let feedback = analyzer.process(pose)
+            if abs(feedback.progress - progress) > 0.01 { progress = feedback.progress }
+            setFaultJoints(joints(for: feedback.activeFaults))
+
+            if let fault = feedback.activeFaults.first {
+                show(Cue(text: fault.cue, kind: .warn))
+                voice.say(fault.cue, key: fault.id, cooldown: 5)
+            }
+
+            if isHold { updateHold(feedback) }
+
+            switch feedback.event {
+            case .rep(let result): registerRep(result)
+            case .partial(let text):
+                show(Cue(text: text, kind: .warn))
+                voice.say(text, key: "partial", cooldown: 3, priority: true)
+                Haptics.warning()
+            case nil: break
+            }
+
+        default:
+            break
+        }
+    }
+
+    private func isFramed(_ pose: Pose) -> Bool {
+        let sides: [Side] = spec.bothSidesRequired ? [.left, .right] : [pose.bestSide]
+        for side in sides {
+            for role in spec.required where !pose.has(role.joint(side)) { return false }
+        }
+        return true
+    }
+
+    private func joints(for rules: [FormRule]) -> Set<Joint> {
+        var set = Set<Joint>()
+        let side = analyzer.side
+        for rule in rules {
+            for role in rule.highlight {
+                set.insert(role.joint(side))
+                if rule.bothSides { set.insert(role.joint(side.opposite)) }
+            }
+        }
+        return set
+    }
+
+    private func setFaultJoints(_ joints: Set<Joint>) {
+        if faultJoints != joints { faultJoints = joints }
+    }
+
+    private func updateHold(_ feedback: FrameFeedback) {
+        holdSeconds = analyzer.holdSeconds
+        if feedback.inPosition == false {
+            show(Cue(text: String(localized: "Get into position"), kind: .info))
+            if case .hold(let cfg) = spec.kind { voice.say(cfg.positionCue, key: "position", cooldown: 6) }
+        }
+        let remaining = target - Int(holdSeconds)
+        if remaining != lastHoldAnnouncement {
+            if remaining == 10 && target > 15 { voice.say(String(localized: "Ten seconds left"), key: "hold10", cooldown: 0, priority: true) }
+            if remaining == target / 2 && target >= 20 { voice.say(String(localized: "Halfway"), key: "holdHalf", cooldown: 0, priority: true) }
+            lastHoldAnnouncement = remaining
+        }
+        if holdSeconds >= Double(target) { completeSet() }
+    }
+
+    private func registerRep(_ result: RepResult) {
+        repCount += 1
+        lastRepScore = result.score
+        repScores.append(result.score)
+        for fault in result.faults { faultCounts[fault, default: 0] += 1 }
+        Haptics.rep()
+
+        var spoken = ["\(repCount)"]
+        let remaining = target - repCount
+        if let fault = result.faults.first {
+            spoken.append(fault)
+            perfectStreak = 0
+            show(Cue(text: fault, kind: .warn))
+        } else {
+            if result.score >= 90 { perfectStreak += 1 }
+            if perfectStreak > 0 && perfectStreak % 4 == 0 { spoken.append(String(localized: "Perfect form")) }
+            show(Cue(text: String(localized: "Great rep · \(result.score)"), kind: .good))
+        }
+        if remaining == 2 && target >= 6 { spoken.append(String(localized: "Two more")) }
+        if remaining == 1 && target >= 4 { spoken.append(String(localized: "Last one")) }
+        voice.say(spoken.joined(separator: ". "), key: "rep", cooldown: 0, priority: true)
+
+        if repCount >= target { completeSet() }
+    }
+
+    // MARK: - Flow
+
+    func completeSet() {
+        guard stage == .active else { return }
+        let average: Int
+        let faults: [String: Int]
+        if isHold {
+            average = analyzer.holdScore
+            faults = analyzer.holdFaultCounts
+        } else {
+            average = repScores.isEmpty ? 0 : repScores.reduce(0, +) / repScores.count
+            faults = faultCounts
+        }
+        results.append(SetResult(exerciseID: spec.id, exerciseName: spec.name, setNumber: setNumber,
+                                 reps: isHold ? 0 : repCount, holdSeconds: Int(holdSeconds),
+                                 avgScore: average, faults: faults, weightKg: weightKg))
+        Haptics.success()
+        setFaultJoints([])
+
+        if setNumber < current.sets {
+            voice.say(String(localized: "Set \(setNumber) done. Form score \(average). Rest up."), key: "setDone", cooldown: 0, priority: true)
+            startRest()
+        } else {
+            voice.say(String(localized: "\(spec.name) complete. Average form \(average)."), key: "exerciseDone", cooldown: 0, priority: true)
+            timer?.invalidate()
+            stage = .exerciseDone
+        }
+    }
+
+    func skipRest() {
+        guard case .resting = stage else { return }
+        nextSet()
+    }
+
+    func addRest(_ seconds: Int) {
+        if case .resting(let remaining) = stage { stage = .resting(remaining + seconds) }
+    }
+
+    func continueToNextExercise() {
+        guard index + 1 < plan.count else {
+            finish()
+            return
+        }
+        index += 1
+        setNumber = 1
+        analyzer = ExerciseAnalyzer(spec: spec)
+        weightKg = current.weightKg ?? 0
+        resetSetState()
+        inFrameSince = nil
+        stage = .framing
+        voice.say(String(localized: "Next up: \(spec.name). \(spec.camera.instruction)"), key: "next", cooldown: 0, priority: true)
+    }
+
+    func finish() {
+        if stage == .active, repCount > 0 || holdSeconds > 1 { completeSet() }
+        timer?.invalidate()
+        stage = .finished
+        voice.say(String(localized: "Workout complete. Great work."), key: "finished", cooldown: 0, priority: true)
+    }
+
+    func stopAll() {
+        timer?.invalidate()
+        cueClear?.cancel()
+        voice.stop()
+    }
+
+    private func startCountdown() {
+        resetSetState()
+        stage = .countdown(3)
+        voice.say(String(localized: "Three"), key: "count", cooldown: 0, priority: true)
+        runTimer { [weak self] in
+            guard let self, case .countdown(let n) = self.stage else { return }
+            if n <= 1 {
+                self.timer?.invalidate()
+                self.analyzer.reset()
+                self.stage = .active
+                self.voice.say(String(localized: "Go"), key: "count", cooldown: 0, priority: true)
+            } else {
+                self.stage = .countdown(n - 1)
+                self.voice.say(n - 1 == 2 ? String(localized: "Two") : String(localized: "One"), key: "count", cooldown: 0, priority: true)
+            }
+        }
+    }
+
+    private func startRest() {
+        stage = .resting(current.restSeconds)
+        runTimer { [weak self] in
+            guard let self, case .resting(let remaining) = self.stage else { return }
+            if remaining <= 1 {
+                self.nextSet()
+            } else {
+                if remaining - 1 == 5 { self.voice.say(String(localized: "Get ready"), key: "ready", cooldown: 0, priority: true) }
+                self.stage = .resting(remaining - 1)
+            }
+        }
+    }
+
+    private func nextSet() {
+        timer?.invalidate()
+        setNumber += 1
+        startCountdown()
+    }
+
+    private func resetSetState() {
+        repCount = 0
+        holdSeconds = 0
+        repScores = []
+        faultCounts = [:]
+        lastRepScore = nil
+        progress = 0
+        perfectStreak = 0
+        lastHoldAnnouncement = 0
+        outOfFrameSince = nil
+        analyzer.reset()
+        cue = nil
+    }
+
+    private func runTimer(_ tick: @escaping () -> Void) {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in tick() }
+    }
+
+    private func show(_ newCue: Cue) {
+        if cue != newCue {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { cue = newCue }
+        }
+        cueClear?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            withAnimation(.easeOut(duration: 0.25)) { self?.cue = nil }
+        }
+        cueClear = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2, execute: work)
+    }
+}
