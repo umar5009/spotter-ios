@@ -10,7 +10,7 @@ struct OnboardingView: View {
     @State private var step = 0
     @State private var cameraGranted = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
 
-    private let lastStep = 5
+    private let lastStep = 6
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,6 +57,7 @@ struct OnboardingView: View {
                     }
                 }
                 case 4: cameraStep
+                case 5: badgesStep
                 default: planReady
                 }
             }
@@ -146,6 +147,22 @@ struct OnboardingView: View {
         .padding(.horizontal, 20)
     }
 
+    private var badgesStep: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("How you earn badges").font(.display(30, weight: .heavy)).foregroundStyle(.white).padding(.top, 24)
+                Text("Progress recounts your saved workouts and weigh-ins. A badge stays once you qualify, even if a streak breaks.")
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                ForEach(SpotterBadge.allCases) { badge in
+                    badgeRow(badge)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 12)
+        }
+    }
+
     private var planReady: some View {
         let plan = PlanBuilder.today(place: TrainingPlace(rawValue: placeRaw) ?? .home,
                                      level: Level(rawValue: levelRaw) ?? .beginner,
@@ -179,6 +196,20 @@ struct OnboardingView: View {
                     .foregroundStyle(Theme.textSecondary)
             }
             .padding(.horizontal, 20)
+        }
+    }
+
+    private func badgeRow(_ badge: SpotterBadge) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: badge.symbol)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Theme.accent)
+                .frame(width: 44, height: 44)
+                .background(Theme.accentSoft, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(badge.title).font(.display(17, weight: .bold)).foregroundStyle(.white)
+                Text(badge.requirement).font(.subheadline).foregroundStyle(Theme.textSecondary).fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 

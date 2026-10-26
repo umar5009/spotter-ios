@@ -115,7 +115,7 @@ struct RootView: View {
             }
         }
         .onChange(of: tab) { _, new in
-            let names = ["today", "exercises", "streaks", "progress", "profile"]
+            let names = ["today", "exercises", "gyms", "streaks", "progress", "profile"]
             let name = names.indices.contains(new) ? names[new] : "today"
             SpotterAnalytics.click("tab", screen: "root", ["tab": name])
             logScreen()
@@ -141,7 +141,7 @@ struct RootView: View {
             SpotterAnalytics.screen("onboarding")
             return
         }
-        let names = ["today", "exercises", "streaks", "progress", "profile"]
+        let names = ["today", "exercises", "gyms", "streaks", "progress", "profile"]
         SpotterAnalytics.screen(names.indices.contains(tab) ? names[tab] : "today")
     }
 
@@ -149,9 +149,10 @@ struct RootView: View {
         switch route {
         case "today": tab = 0
         case "exercises": tab = 1
-        case "streaks": tab = 2
-        case "progress": tab = 3
-        case "profile": tab = 4
+        case "gyms": tab = 2
+        case "streaks": tab = 3
+        case "progress": tab = 4
+        case "profile": tab = 5
         case "paywall":
             tab = 0
             router.showPaywall = true
@@ -170,15 +171,18 @@ struct RootView: View {
                     LibraryView()
                         .tabItem { Label("Exercises", systemImage: "figure.strengthtraining.traditional") }
                         .tag(1)
+                    GymsView()
+                        .tabItem { Label("Gyms", systemImage: "mappin.and.ellipse") }
+                        .tag(2)
                     StreaksView()
                         .tabItem { Label("Streaks", systemImage: "flame.fill") }
-                        .tag(2)
+                        .tag(3)
                     ProgressScreen()
                         .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
-                        .tag(3)
+                        .tag(4)
                     ProfileView()
                         .tabItem { Label("Profile", systemImage: "person.crop.circle") }
-                        .tag(4)
+                        .tag(5)
                 }
             } else {
                 OnboardingView {

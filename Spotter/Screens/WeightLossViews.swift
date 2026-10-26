@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Home card: the bar from the starting weigh-in down to the goal.
+/// Progress card for the loss target, the badge, and the week or month check-in.
 struct WeightLossCard: View {
     @Query(sort: \WeightEntry.date) private var entries: [WeightEntry]
     @AppStorage("goalWeightKg") private var goalWeightKg = 0.0
@@ -38,7 +38,7 @@ struct WeightLossCard: View {
                     .foregroundStyle(Theme.textSecondary)
                 WeightLossBar(fraction: 0)
                 Button("Set target") {
-                    SpotterAnalytics.click("open_loss_target", screen: "today")
+                    SpotterAnalytics.click("open_loss_target", screen: "progress")
                     showTarget = true
                 }
                 .buttonStyle(PrimaryButtonStyle())
@@ -74,11 +74,11 @@ struct WeightLossCard: View {
                 .foregroundStyle(Theme.textSecondary)
             HStack(spacing: 16) {
                 Button("Log weight") {
-                    SpotterAnalytics.click("log_weight", screen: "today")
+                    SpotterAnalytics.click("log_weight", screen: "progress")
                     showLog = true
                 }
                 Button("Edit target") {
-                    SpotterAnalytics.click("open_loss_target", screen: "today")
+                    SpotterAnalytics.click("open_loss_target", screen: "progress")
                     showTarget = true
                 }
             }
@@ -129,40 +129,6 @@ struct WeightLossBar: View {
         .frame(height: 10)
         .accessibilityLabel(Text("Weight loss progress"))
         .accessibilityValue(Text("\(Int((min(1, max(0, fraction)) * 100).rounded())) percent"))
-    }
-}
-
-struct WeightLossTrack: View {
-    let entries: [WeightEntry]
-    @AppStorage("goalWeightKg") private var goalWeightKg = 0.0
-    @AppStorage(WeightLoss.startKey) private var lossStartKg = 0.0
-    @AppStorage(WeightLoss.cadenceKey) private var cadenceRaw = LossCadence.week.rawValue
-    @AppStorage(WeightLoss.periodKey) private var lossPeriodKg = 0.0
-    @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
-
-    private var unit: Measure.Weight { Measure.Weight(rawValue: weightUnitRaw) ?? .kilograms }
-
-    var body: some View {
-        let cadence = LossCadence(rawValue: cadenceRaw) ?? .week
-        if let status = WeightLoss.status(entries: entries, goalKg: goalWeightKg, startKg: lossStartKg, cadence: cadence, periodKg: lossPeriodKg) {
-            VStack(alignment: .leading, spacing: 8) {
-                WeightLossBar(fraction: status.fraction)
-                Text(caption(status))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.textSecondary)
-            }
-        }
-    }
-
-    private func caption(_ status: WeightLoss.Status) -> String {
-        let goal = "\(Measure.format(unit.fromKilograms(status.goalKg))) \(unit.symbol)"
-        if status.reached {
-            return String(localized: "Goal reached · \(goal)")
-        }
-        if status.currentKg == nil || status.startKg - status.goalKg <= 0.05 {
-            return String(localized: "Goal \(goal)")
-        }
-        return String(localized: "\(Measure.format(unit.fromKilograms(status.lostKg))) \(unit.symbol) lost · \(Measure.format(unit.fromKilograms(status.remainingKg))) \(unit.symbol) to \(goal)")
     }
 }
 
@@ -280,7 +246,7 @@ struct WeightLossTargetSheet: View {
         }
         goalWeightKg = goal
         lossPeriodKg = period
-        SpotterAnalytics.click("set_loss_target", screen: "today", ["cadence": cadenceRaw])
+        SpotterAnalytics.click("set_loss_target", screen: "progress", ["cadence": cadenceRaw])
         Haptics.success()
         dismiss()
     }

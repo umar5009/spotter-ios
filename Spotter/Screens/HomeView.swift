@@ -62,7 +62,6 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     header
                     quoteCard
-                    WeightLossCard()
                     todayCard
                     if !store.isPro { upgradeCard }
                     weekCard

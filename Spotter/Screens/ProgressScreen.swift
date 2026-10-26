@@ -10,6 +10,7 @@ struct ProgressScreen: View {
     @AppStorage("heightCm") private var heightCm = 0.0
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
     @State private var showWeightLog = false
+    @State private var showTarget = false
 
     private var totalReps: Int { logs.reduce(0) { $0 + $1.totalReps } }
     private var avgForm: Int { logs.isEmpty ? 0 : logs.reduce(0) { $0 + $1.avgFormScore } / logs.count }
@@ -52,9 +53,14 @@ struct ProgressScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    BadgeBoardView(logs: logs, weights: weights) {
+                        showTarget = true
+                    }
                     if logs.isEmpty && weights.isEmpty {
                         emptyState
                     } else {
+                        weightCard
+                        if goalWeightKg > 0 { WeightLossCard() }
                         if !logs.isEmpty {
                             HStack(spacing: 10) {
                                 stat("\(logs.count)", "workouts", "figure.run")
@@ -65,9 +71,6 @@ struct ProgressScreen: View {
                                     stat("\(streak)", "day streak", "flame.fill")
                                 }
                             }
-                        }
-                        weightCard
-                        if !logs.isEmpty {
                             formChart
                             if !topFixes.isEmpty { fixesCard }
                             exercisesCard
@@ -92,6 +95,7 @@ struct ProgressScreen: View {
                 }
             }
             .sheet(isPresented: $showWeightLog) { WeightLogSheet() }
+            .sheet(isPresented: $showTarget) { WeightLossTargetSheet() }
         }
     }
 
@@ -118,12 +122,17 @@ struct ProgressScreen: View {
                         weightTile("This week", snap.weekDelta)
                         weightTile("This month", snap.monthDelta)
                     }
-                    if goalWeightKg > 0 {
-                        WeightLossTrack(entries: weights)
-                    }
                     BMIReadout(weightKg: latest.weightKg, heightCm: heightCm) {
                         SpotterAnalytics.click("log_weight", screen: "progress", ["source": "add_height"])
                         showWeightLog = true
+                    }
+                    if goalWeightKg <= 0 {
+                        Button("Set a loss target") {
+                            SpotterAnalytics.click("open_loss_target", screen: "progress", ["source": "weight"])
+                            showTarget = true
+                        }
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Theme.accent)
                     }
                     Button("Log weight") {
                         SpotterAnalytics.click("log_weight", screen: "progress")
@@ -134,6 +143,14 @@ struct ProgressScreen: View {
                     Text("Weigh in to track loss by week and by month.")
                         .font(.subheadline)
                         .foregroundStyle(Theme.textSecondary)
+                    if goalWeightKg <= 0 {
+                        Button("Set a loss target") {
+                            SpotterAnalytics.click("open_loss_target", screen: "progress", ["source": "weight"])
+                            showTarget = true
+                        }
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Theme.accent)
+                    }
                     Button("Log weight") {
                         SpotterAnalytics.click("log_weight", screen: "progress")
                         showWeightLog = true

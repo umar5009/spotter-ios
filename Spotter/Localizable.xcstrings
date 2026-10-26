@@ -313,12 +313,42 @@
         }
       }
     },
+    "%@ · %@ · form %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@ · form %3$lld"
+          }
+        }
+      }
+    },
     "%@ · %@ · target %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ · %2$@ · target %3$@"
+          }
+        }
+      }
+    },
+    "%@ · %lldd · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$lldd · %3$@"
+          }
+        }
+      }
+    },
+    "%@ · month · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · month · %2$@"
           }
         }
       }
@@ -589,6 +619,19 @@
         }
       }
     },
+    "%@ × %lld = %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ × %2$lld = %3$@"
+          }
+        }
+      }
+    },
+    "%@ ahead" : {
+
+    },
     "%@ and %@" : {
       "localizations" : {
         "en" : {
@@ -721,10 +764,16 @@
         }
       }
     },
+    "%@ for the month" : {
+
+    },
     "%@ is paused" : {
 
     },
     "%@ is playing" : {
+
+    },
+    "%@ km" : {
 
     },
     "%@ lost. Keep the bar moving." : {
@@ -772,6 +821,16 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@. %2$@"
+          }
+        }
+      }
+    },
+    "%@/day · %@/mo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@/day · %2$@/mo"
           }
         }
       }
@@ -1072,6 +1131,9 @@
         }
       }
     },
+    "%lld days" : {
+
+    },
     "%lld ft %lld in" : {
       "localizations" : {
         "ar" : {
@@ -1190,6 +1252,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 分钟"
+          }
+        }
+      }
+    },
+    "%lld of %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld %3$@"
           }
         }
       }
@@ -1374,7 +1446,16 @@
     "%lld songs" : {
 
     },
+    "%lld workouts" : {
+
+    },
+    "%lld-day streak" : {
+
+    },
     "%lld%%" : {
+
+    },
+    "%lld%% of the goal" : {
 
     },
     "%llds" : {
@@ -1667,6 +1748,15 @@
           }
         }
       }
+    },
+    "1 day" : {
+
+    },
+    "1 workout" : {
+
+    },
+    "1-day streak" : {
+
     },
     "5" : {
       "localizations" : {
@@ -3264,6 +3354,9 @@
     "Arms" : {
 
     },
+    "Arrive at the gym" : {
+
+    },
     "At home" : {
       "localizations" : {
         "ar" : {
@@ -3624,6 +3717,9 @@
     "Back day" : {
 
     },
+    "Badges" : {
+
+    },
     "Balance" : {
       "localizations" : {
         "ar" : {
@@ -3858,6 +3954,9 @@
           }
         }
       }
+    },
+    "Beginner Champ" : {
+
     },
     "Bench Press" : {
 
@@ -5675,6 +5774,9 @@
         }
       }
     },
+    "Clear" : {
+
+    },
     "Close" : {
       "localizations" : {
         "ar" : {
@@ -6087,6 +6189,9 @@
         }
       }
     },
+    "Contact" : {
+
+    },
     "Continue" : {
       "localizations" : {
         "ar" : {
@@ -6144,6 +6249,12 @@
           }
         }
       }
+    },
+    "Continue on %@" : {
+
+    },
+    "Continue straight" : {
+
     },
     "Controlled reps, full range of motion" : {
       "localizations" : {
@@ -6380,6 +6491,9 @@
         }
       }
     },
+    "Daily" : {
+
+    },
     "Date" : {
       "localizations" : {
         "ar" : {
@@ -6554,7 +6668,13 @@
         }
       }
     },
+    "days" : {
+
+    },
     "Delts" : {
+
+    },
+    "Directions" : {
 
     },
     "Discard workout" : {
@@ -6793,6 +6913,12 @@
 
     },
     "Down this week" : {
+
+    },
+    "drive" : {
+
+    },
+    "Drive" : {
 
     },
     "Drive through your heels until your hips are in line with your knees and shoulders." : {
@@ -7267,6 +7393,9 @@
           }
         }
       }
+    },
+    "Earned" : {
+
     },
     "Easy core and glutes. Keep the streak without grinding." : {
       "localizations" : {
@@ -8308,6 +8437,15 @@
     "Finding popular gym songs near you." : {
 
     },
+    "Finding the shortest road path…" : {
+
+    },
+    "Finish 1 coached workout." : {
+
+    },
+    "Finish 5 coached workouts." : {
+
+    },
     "Finish set" : {
       "localizations" : {
         "ar" : {
@@ -8946,6 +9084,9 @@
         }
       }
     },
+    "Form Champ" : {
+
+    },
     "Form score · last 7 days" : {
       "localizations" : {
         "ar" : {
@@ -9063,6 +9204,9 @@
       }
     },
     "Free gym songs in %@." : {
+
+    },
+    "From you" : {
 
     },
     "Front view" : {
@@ -9944,9 +10088,6 @@
         }
       }
     },
-    "Goal %@" : {
-
-    },
     "Goal %@ %@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10075,6 +10216,9 @@
           }
         }
       }
+    },
+    "Goal Weight" : {
+
     },
     "Good afternoon" : {
       "localizations" : {
@@ -10605,6 +10749,9 @@
         }
       }
     },
+    "Gyms" : {
+
+    },
     "Halfway" : {
       "localizations" : {
         "ar" : {
@@ -10778,6 +10925,12 @@
           }
         }
       }
+    },
+    "Head onto %@" : {
+
+    },
+    "Head toward the gym" : {
+
     },
     "Hear rep counts and corrections like “Keep your chest up.”" : {
       "localizations" : {
@@ -11426,6 +11579,9 @@
         }
       }
     },
+    "How you earn badges" : {
+
+    },
     "How your AI coach sees you" : {
       "localizations" : {
         "ar" : {
@@ -11773,6 +11929,9 @@
           }
         }
       }
+    },
+    "Iron Champ" : {
+
     },
     "It's %@" : {
 
@@ -12897,6 +13056,9 @@
         }
       }
     },
+    "Listed pass price in USD. Reserving saves it on this iPhone. Spotter does not charge the gym." : {
+
+    },
     "Listen and adjust" : {
       "localizations" : {
         "ar" : {
@@ -12956,6 +13118,9 @@
       }
     },
     "Load" : {
+
+    },
+    "Location is off. Turn it on to see gyms and a route." : {
 
     },
     "Lock out fully overhead." : {
@@ -14194,6 +14359,12 @@
         }
       }
     },
+    "Make a U-turn" : {
+
+    },
+    "Make a U-turn onto %@" : {
+
+    },
     "Membership" : {
       "localizations" : {
         "ar" : {
@@ -14777,6 +14948,9 @@
     "Move, then stop." : {
 
     },
+    "Nearby gyms" : {
+
+    },
     "New badge" : {
 
     },
@@ -14837,6 +15011,9 @@
           }
         }
       }
+    },
+    "Next · %@" : {
+
     },
     "Next up: %@. %@" : {
       "localizations" : {
@@ -15025,6 +15202,9 @@
       }
     },
     "Nice" : {
+
+    },
+    "No badge yet" : {
 
     },
     "No change" : {
@@ -15262,6 +15442,15 @@
     "No gym songs were found for your country. Try again." : {
 
     },
+    "No gyms showed up nearby." : {
+
+    },
+    "No phone listed" : {
+
+    },
+    "No road path is available for this gym yet." : {
+
+    },
     "No streak yet" : {
       "localizations" : {
         "ar" : {
@@ -15319,6 +15508,9 @@
           }
         }
       }
+    },
+    "No website listed" : {
+
     },
     "No weigh-ins yet" : {
       "localizations" : {
@@ -16255,6 +16447,15 @@
         }
       }
     },
+    "Pass" : {
+
+    },
+    "per day" : {
+
+    },
+    "per month" : {
+
+    },
     "Perfect form" : {
       "localizations" : {
         "ar" : {
@@ -17186,6 +17387,9 @@
           }
         }
       }
+    },
+    "Progress recounts your saved workouts and weigh-ins. A badge stays once you qualify, even if a streak breaks." : {
+
     },
     "Progressive strength with perfect form" : {
       "localizations" : {
@@ -18605,6 +18809,12 @@
         }
       }
     },
+    "Reserve" : {
+
+    },
+    "Reserved" : {
+
+    },
     "Rest" : {
       "localizations" : {
         "ar" : {
@@ -19018,6 +19228,9 @@
     "Romanian deadlifts, hip thrusts and lunges." : {
 
     },
+    "Route" : {
+
+    },
     "s hold" : {
       "localizations" : {
         "ar" : {
@@ -19308,6 +19521,9 @@
         }
       }
     },
+    "Score 85 or higher on 5 workouts." : {
+
+    },
     "Seconds" : {
       "localizations" : {
         "ar" : {
@@ -19578,6 +19794,12 @@
     "Set a goal under your current weight. The bar fills as you lose it." : {
 
     },
+    "Set a loss target" : {
+
+    },
+    "Set a loss target, then weigh in at or under it." : {
+
+    },
     "Set chest, back, legs, and the other days" : {
 
     },
@@ -19819,6 +20041,9 @@
         }
       }
     },
+    "sharp sessions" : {
+
+    },
     "Short sessions you'll actually do" : {
       "localizations" : {
         "ar" : {
@@ -19989,6 +20214,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "休息更短，每分钟做更多"
+          }
+        }
+      }
+    },
+    "Shortest path %@ · %lld min %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortest path %1$@ · %2$lld min %3$@"
           }
         }
       }
@@ -20813,6 +21048,12 @@
           }
         }
       }
+    },
+    "Spotter calls each turn while this tab is open." : {
+
+    },
+    "Spotter couldn't read your location." : {
+
     },
     "Spotter flagged this %lld time today. It'll watch for it next session." : {
       "localizations" : {
@@ -22751,6 +22992,9 @@
         }
       }
     },
+    "Steady Champ" : {
+
+    },
     "Step back so I can see your whole body" : {
       "localizations" : {
         "ar" : {
@@ -23273,6 +23517,9 @@
         }
       }
     },
+    "Super Champ" : {
+
+    },
     "Talks you through every rep, so you never need to look at your phone." : {
       "localizations" : {
         "ar" : {
@@ -23623,6 +23870,9 @@
           }
         }
       }
+    },
+    "the road" : {
+
     },
     "The set counts when the last rep looks like the first." : {
       "localizations" : {
@@ -24439,6 +24689,15 @@
         }
       }
     },
+    "Train 7 days in a row." : {
+
+    },
+    "Train 14 days in a row." : {
+
+    },
+    "Train 30 days in a row." : {
+
+    },
     "Train at" : {
       "localizations" : {
         "ar" : {
@@ -24794,6 +25053,18 @@
 
     },
     "Tuck your elbows a little" : {
+
+    },
+    "Turn left" : {
+
+    },
+    "Turn left onto %@" : {
+
+    },
+    "Turn right" : {
+
+    },
+    "Turn right onto %@" : {
 
     },
     "Turn side-on to the camera. Prop your phone at hip height, about 2 to 3 metres away." : {
@@ -25556,6 +25827,18 @@
         }
       }
     },
+    "Waiting for your location" : {
+
+    },
+    "Waiting for your location to draw the path." : {
+
+    },
+    "walk" : {
+
+    },
+    "Walk" : {
+
+    },
     "Walk into today's session like the result is already decided by showing up." : {
       "localizations" : {
         "ar" : {
@@ -25734,6 +26017,9 @@
       }
     },
     "Week" : {
+
+    },
+    "Week Champ" : {
 
     },
     "Weekly" : {
@@ -26208,6 +26494,9 @@
           }
         }
       }
+    },
+    "workout" : {
+
     },
     "Workout complete" : {
       "localizations" : {
@@ -26862,6 +27151,15 @@
         }
       }
     },
+    "You have arrived" : {
+
+    },
+    "You have arrived at %@" : {
+
+    },
+    "You have arrived at the gym" : {
+
+    },
     "You reached %@ %@. The badge stays on your home screen." : {
       "localizations" : {
         "en" : {
@@ -27115,6 +27413,9 @@
           }
         }
       }
+    },
+    "Your location stays on the map while this tab is open." : {
+
     },
     "Your plan" : {
       "localizations" : {
