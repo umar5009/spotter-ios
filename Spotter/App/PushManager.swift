@@ -43,6 +43,7 @@ final class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDel
             UIApplication.shared.unregisterForRemoteNotifications()
             try? await Messaging.messaging().unsubscribe(fromTopic: Self.topic)
             SpotterAnalytics.log("notification_permission", ["granted": "false"])
+            await DayReminder.reschedule()
             return
         }
 
@@ -109,6 +110,7 @@ final class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDel
         guard granted else { return }
         UIApplication.shared.registerForRemoteNotifications()
         subscribeIfNeeded()
+        Task { await DayReminder.reschedule() }
     }
 
     private func subscribeIfNeeded() {

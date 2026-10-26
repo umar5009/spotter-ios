@@ -303,6 +303,26 @@
         }
       }
     },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ · %@ · target %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@ · target %3$@"
+          }
+        }
+      }
+    },
     "%@ %@" : {
       "localizations" : {
         "ar" : {
@@ -495,6 +515,16 @@
         }
       }
     },
+    "%@ %@ lost · %@ %@ to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ lost · %3$@ %4$@ to %5$@"
+          }
+        }
+      }
+    },
     "%@ %@ to your %@ %@ goal" : {
       "localizations" : {
         "ar" : {
@@ -555,6 +585,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "距离 %3$@ %4$@ 的目标还差 %1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ and %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ and %2$@"
           }
         }
       }
@@ -677,6 +717,61 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ 完成。平均动作质量 %2$lld。"
+          }
+        }
+      }
+    },
+    "%@ is paused" : {
+
+    },
+    "%@ is playing" : {
+
+    },
+    "%@ lost. Keep the bar moving." : {
+
+    },
+    "%@ lost. That hits this month's target." : {
+
+    },
+    "%@ lost. That hits this week's target." : {
+
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@, %@, and %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@, and %3$@"
+          }
+        }
+      }
+    },
+    "%@, %@, and %@, plus %lld more" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@, and %3$@, plus %4$lld more"
+          }
+        }
+      }
+    },
+    "%@. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@. %2$@"
           }
         }
       }
@@ -1099,6 +1194,9 @@
         }
       }
     },
+    "%lld percent" : {
+
+    },
     "%lld points" : {
       "localizations" : {
         "ar" : {
@@ -1273,6 +1371,12 @@
         }
       }
     },
+    "%lld songs" : {
+
+    },
+    "%lld%%" : {
+
+    },
     "%llds" : {
       "localizations" : {
         "ar" : {
@@ -1390,6 +1494,7 @@
       }
     },
     "+%lld exercises in your full plan" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2329,6 +2434,9 @@
         }
       }
     },
+    "A phone camera can't reliably see if your back rounds. Keep a flat back and a weight you can hold still." : {
+
+    },
     "A phone camera can't reliably see spinal rounding. Keep a neutral back and use a weight you control." : {
       "localizations" : {
         "ar" : {
@@ -2387,6 +2495,12 @@
         }
       }
     },
+    "A reminder each day names that day's exercises. Turn them off here, or in iOS Settings." : {
+
+    },
+    "A row, then raises, curls and a press." : {
+
+    },
     "A second full-body day so Monday isn't the only hard one." : {
       "localizations" : {
         "ar" : {
@@ -2444,6 +2558,9 @@
           }
         }
       }
+    },
+    "A short day keeps the streak. Zero does not." : {
+
     },
     "A short day. Show up, then rest." : {
       "localizations" : {
@@ -3141,6 +3258,12 @@
         }
       }
     },
+    "Arm day" : {
+
+    },
+    "Arms" : {
+
+    },
     "At home" : {
       "localizations" : {
         "ar" : {
@@ -3321,6 +3444,9 @@
         }
       }
     },
+    "Automatic exercises" : {
+
+    },
     "Average form score" : {
       "localizations" : {
         "ar" : {
@@ -3495,6 +3621,9 @@
         }
       }
     },
+    "Back day" : {
+
+    },
     "Balance" : {
       "localizations" : {
         "ar" : {
@@ -3552,6 +3681,9 @@
           }
         }
       }
+    },
+    "Barbell · Bench" : {
+
     },
     "Barbell · Dumbbells" : {
       "localizations" : {
@@ -3727,6 +3859,15 @@
         }
       }
     },
+    "Bench Press" : {
+
+    },
+    "Bench, then shoulders." : {
+
+    },
+    "Bent-over Row" : {
+
+    },
     "Best %lld" : {
       "localizations" : {
         "ar" : {
@@ -3827,64 +3968,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Melhor dia"
-          }
-        },
-        "ur" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "بہترین دن"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最佳日"
-          }
-        }
-      }
-    },
-    "Best days" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أفضل الأيام"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beste Tage"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mejores días"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meilleurs jours"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "सर्वश्रेष्ठ दिन"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ベストの日"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Melhores dias"
           }
         },
         "ur" : {
@@ -4013,6 +4096,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这 %lld 天连续里的最佳日。"
+          }
+        }
+      }
+    },
+    "Best days" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أفضل الأيام"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beste Tage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejores días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meilleurs jours"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "सर्वश्रेष्ठ दिन"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ベストの日"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melhores dias"
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بہترین دن"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最佳日"
           }
         }
       }
@@ -5351,6 +5492,9 @@
         }
       }
     },
+    "Celebrate" : {
+
+    },
     "Centimetres" : {
       "localizations" : {
         "ar" : {
@@ -5409,6 +5553,9 @@
         }
       }
     },
+    "Change exercise" : {
+
+    },
     "Chest" : {
       "localizations" : {
         "ar" : {
@@ -5466,6 +5613,9 @@
           }
         }
       }
+    },
+    "Chest day" : {
+
     },
     "Choose kilograms or pounds, and centimetres or feet and inches. BMI uses the same numbers either way. Healthy for most adults is 18.5–24.9." : {
       "localizations" : {
@@ -5582,6 +5732,12 @@
           }
         }
       }
+    },
+    "Close music" : {
+
+    },
+    "Closes the song list" : {
+
     },
     "cm" : {
       "localizations" : {
@@ -6105,6 +6261,9 @@
         }
       }
     },
+    "Core day" : {
+
+    },
     "Counts a rep only when you reach full range and return." : {
       "localizations" : {
         "ar" : {
@@ -6395,6 +6554,9 @@
         }
       }
     },
+    "Delts" : {
+
+    },
     "Discard workout" : {
       "localizations" : {
         "ar" : {
@@ -6627,6 +6789,15 @@
         }
       }
     },
+    "Down this month" : {
+
+    },
+    "Down this week" : {
+
+    },
+    "Drive through your heels until your hips are in line with your knees and shoulders." : {
+
+    },
     "Drive through your whole foot to stand tall." : {
       "localizations" : {
         "ar" : {
@@ -6684,6 +6855,9 @@
           }
         }
       }
+    },
+    "Drive your hips all the way up and squeeze." : {
+
     },
     "Drive your hips higher and squeeze at the top." : {
       "localizations" : {
@@ -7033,6 +7207,9 @@
         }
       }
     },
+    "Each choice repeats every week. Tap a day to open it on the home screen." : {
+
+    },
     "Each exercise you finish is kept here with the reps, load and form score." : {
       "localizations" : {
         "ar" : {
@@ -7148,6 +7325,15 @@
           }
         }
       }
+    },
+    "Easy core and glutes. Move, then stop." : {
+
+    },
+    "Easy on purpose." : {
+
+    },
+    "Edit target" : {
+
     },
     "End" : {
       "localizations" : {
@@ -7323,6 +7509,9 @@
         }
       }
     },
+    "Enter a goal between %@." : {
+
+    },
     "Enter a height between 90 and 250 cm." : {
       "localizations" : {
         "ar" : {
@@ -7439,6 +7628,9 @@
         }
       }
     },
+    "Enter a loss up to 20 %@, or leave it blank." : {
+
+    },
     "Enter a weight between %@." : {
       "localizations" : {
         "ar" : {
@@ -7497,6 +7689,33 @@
         }
       }
     },
+    "Enter how much to lose, or leave it blank." : {
+
+    },
+    "Every arm exercise." : {
+
+    },
+    "Every back exercise." : {
+
+    },
+    "Every chest exercise." : {
+
+    },
+    "Every core exercise." : {
+
+    },
+    "Every exercise." : {
+
+    },
+    "Every leg exercise." : {
+
+    },
+    "Every pulling exercise." : {
+
+    },
+    "Every pushing exercise." : {
+
+    },
     "Every session adapts: hit your reps with a form score above 85 and Spotter will suggest progressing." : {
       "localizations" : {
         "ar" : {
@@ -7554,6 +7773,9 @@
           }
         }
       }
+    },
+    "Every shoulder exercise." : {
+
     },
     "Everything runs on your iPhone. No video is recorded or uploaded." : {
       "localizations" : {
@@ -7961,6 +8183,12 @@
         }
       }
     },
+    "Film from the side so Spotter can see your hip lock out." : {
+
+    },
+    "Film from the side, at bench height, so Spotter can see your elbow and hip." : {
+
+    },
     "Filming from the front? Spotter also checks if your knees cave in." : {
       "localizations" : {
         "ar" : {
@@ -8076,6 +8304,9 @@
           }
         }
       }
+    },
+    "Finding popular gym songs near you." : {
+
     },
     "Finish set" : {
       "localizations" : {
@@ -8831,6 +9062,9 @@
         }
       }
     },
+    "Free gym songs in %@." : {
+
+    },
     "Front view" : {
       "localizations" : {
         "ar" : {
@@ -8947,6 +9181,12 @@
         }
       }
     },
+    "Full" : {
+
+    },
+    "Full body" : {
+
+    },
     "Full Body B" : {
       "localizations" : {
         "ar" : {
@@ -9004,6 +9244,9 @@
           }
         }
       }
+    },
+    "Full body day" : {
+
     },
     "Full Body Strength" : {
       "localizations" : {
@@ -9701,7 +9944,11 @@
         }
       }
     },
+    "Goal %@" : {
+
+    },
     "Goal %@ %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9764,6 +10011,12 @@
           }
         }
       }
+    },
+    "Goal %@. Log a weigh-in to start the bar." : {
+
+    },
+    "Goal reached · %@" : {
+
     },
     "Goal weight" : {
       "localizations" : {
@@ -10171,6 +10424,9 @@
         }
       }
     },
+    "Grip just outside your shoulders and unrack with straight wrists." : {
+
+    },
     "Gym" : {
       "localizations" : {
         "ar" : {
@@ -10287,7 +10543,11 @@
         }
       }
     },
+    "Gym mode, tempo coaching and all %lld exercises" : {
+
+    },
     "Gym mode, tempo coaching and all 9 exercises" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10635,6 +10895,9 @@
         }
       }
     },
+    "Hide playback controls" : {
+
+    },
     "High" : {
       "localizations" : {
         "ar" : {
@@ -10808,6 +11071,12 @@
           }
         }
       }
+    },
+    "Hinge until your chest faces the floor, knees softly bent." : {
+
+    },
+    "Hip Thrust" : {
+
     },
     "Hips are sagging. Brace your core" : {
       "localizations" : {
@@ -11505,6 +11774,9 @@
         }
       }
     },
+    "It's %@" : {
+
+    },
     "Keep a straight line from head to heels." : {
       "localizations" : {
         "ar" : {
@@ -12143,6 +12415,9 @@
         }
       }
     },
+    "Last time: %@." : {
+
+    },
     "Lateral Raise" : {
       "localizations" : {
         "ar" : {
@@ -12201,6 +12476,9 @@
         }
       }
     },
+    "Lats" : {
+
+    },
     "Leave one rep in the tank, not the whole workout." : {
       "localizations" : {
         "ar" : {
@@ -12258,6 +12536,12 @@
           }
         }
       }
+    },
+    "Leg day" : {
+
+    },
+    "Legs" : {
+
     },
     "Legs & Glutes" : {
       "localizations" : {
@@ -12433,6 +12717,9 @@
         }
       }
     },
+    "Let the weight hang with a straight arm." : {
+
+    },
     "Let's set up. %@" : {
       "localizations" : {
         "ar" : {
@@ -12549,6 +12836,9 @@
         }
       }
     },
+    "Lie on the bench, feet flat, eyes under the bar." : {
+
+    },
     "Lie on your back, knees bent, feet flat and hip-width apart." : {
       "localizations" : {
         "ar" : {
@@ -12664,6 +12954,9 @@
           }
         }
       }
+    },
+    "Load" : {
+
     },
     "Lock out fully overhead." : {
       "localizations" : {
@@ -12955,6 +13248,12 @@
         }
       }
     },
+    "Lose each month" : {
+
+    },
+    "Lose each week" : {
+
+    },
     "Lose fat, keep muscle" : {
       "localizations" : {
         "ar" : {
@@ -13012,6 +13311,9 @@
           }
         }
       }
+    },
+    "Loss target" : {
+
     },
     "Low" : {
       "localizations" : {
@@ -13419,6 +13721,9 @@
         }
       }
     },
+    "Lower slowly. Your torso stays still." : {
+
+    },
     "Lower Strength" : {
       "localizations" : {
         "ar" : {
@@ -13476,6 +13781,12 @@
           }
         }
       }
+    },
+    "Lower the bar to your mid-chest. Elbows stay under the bar." : {
+
+    },
+    "Lower the bar until it reaches your chest." : {
+
     },
     "Lower until both knees bend to about 90°." : {
       "localizations" : {
@@ -14463,6 +14774,12 @@
         }
       }
     },
+    "Move, then stop." : {
+
+    },
+    "New badge" : {
+
+    },
     "New to training or coming back" : {
       "localizations" : {
         "ar" : {
@@ -14707,6 +15024,9 @@
         }
       }
     },
+    "Nice" : {
+
+    },
     "No change" : {
       "localizations" : {
         "ar" : {
@@ -14938,6 +15258,9 @@
           }
         }
       }
+    },
+    "No gym songs were found for your country. Try again." : {
+
     },
     "No streak yet" : {
       "localizations" : {
@@ -15520,6 +15843,7 @@
       }
     },
     "One lift from each pattern." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15635,6 +15959,9 @@
         }
       }
     },
+    "Opens songs to train with" : {
+
+    },
     "Optional" : {
       "localizations" : {
         "ar" : {
@@ -15692,6 +16019,9 @@
           }
         }
       }
+    },
+    "Other songs" : {
+
     },
     "Over" : {
       "localizations" : {
@@ -16505,7 +16835,11 @@
         }
       }
     },
+    "Press up until your arms lock out. Keep your hips on the bench." : {
+
+    },
     "Pressing strength, then shoulders." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17027,6 +17361,18 @@
         }
       }
     },
+    "Pull" : {
+
+    },
+    "Pull day" : {
+
+    },
+    "Pull the weight all the way to your hip." : {
+
+    },
+    "Pull your elbow back until the weight reaches your hip." : {
+
+    },
     "Purchase" : {
       "localizations" : {
         "ar" : {
@@ -17200,6 +17546,9 @@
           }
         }
       }
+    },
+    "Push day" : {
+
     },
     "Push notifications" : {
       "localizations" : {
@@ -17840,6 +18189,7 @@
       }
     },
     "Raises, curls, and a press." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18071,7 +18421,14 @@
         }
       }
     },
+    "Recovery still counts." : {
+
+    },
+    "Reminder time" : {
+
+    },
     "Reminders and updates. Turn them off here, or in iOS Settings." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18128,6 +18485,9 @@
           }
         }
       }
+    },
+    "Remove" : {
+
     },
     "reps" : {
       "localizations" : {
@@ -18535,6 +18895,9 @@
         }
       }
     },
+    "Roll the weight into the crease of your hips." : {
+
+    },
     "Romanian Deadlift" : {
       "localizations" : {
         "ar" : {
@@ -18594,6 +18957,7 @@
       }
     },
     "Romanian deadlifts and lunges." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18650,6 +19014,9 @@
           }
         }
       }
+    },
+    "Romanian deadlifts, hip thrusts and lunges." : {
+
     },
     "s hold" : {
       "localizations" : {
@@ -18999,6 +19366,9 @@
         }
       }
     },
+    "Set" : {
+
+    },
     "Set %lld" : {
       "localizations" : {
         "ar" : {
@@ -19185,6 +19555,32 @@
         }
       }
     },
+    "Set a goal under %@ %@ to track a loss." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set a goal under %1$@ %2$@ to track a loss."
+          }
+        }
+      }
+    },
+    "Set a goal under your current %@ %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set a goal under your current %1$@ %2$@."
+          }
+        }
+      }
+    },
+    "Set a goal under your current weight. The bar fills as you lose it." : {
+
+    },
+    "Set chest, back, legs, and the other days" : {
+
+    },
     "Set form" : {
       "localizations" : {
         "ar" : {
@@ -19243,6 +19639,9 @@
         }
       }
     },
+    "Set target" : {
+
+    },
     "Set up your camera" : {
       "localizations" : {
         "ar" : {
@@ -19300,6 +19699,9 @@
           }
         }
       }
+    },
+    "Set your feet so your knees bend to about 90°" : {
+
     },
     "sets" : {
       "localizations" : {
@@ -19591,6 +19993,12 @@
         }
       }
     },
+    "Shoulder blades on a bench, feet flat, hip-width apart." : {
+
+    },
+    "Shoulder day" : {
+
+    },
     "Shoulders" : {
       "localizations" : {
         "ar" : {
@@ -19706,6 +20114,9 @@
           }
         }
       }
+    },
+    "Show playback controls" : {
+
     },
     "Show up like someone is counting. The streak is." : {
       "localizations" : {
@@ -20990,6 +21401,9 @@
         }
       }
     },
+    "Spotter's plan" : {
+
+    },
     "Squares fill in after a coached session." : {
       "localizations" : {
         "ar" : {
@@ -21165,6 +21579,7 @@
       }
     },
     "Squat and hinge on the same day." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21279,6 +21694,12 @@
           }
         }
       }
+    },
+    "Squat, bench and a row." : {
+
+    },
+    "Squat, hinge, then hips." : {
+
     },
     "Squat, push, and a short core finisher." : {
       "localizations" : {
@@ -21453,6 +21874,9 @@
           }
         }
       }
+    },
+    "Squeeze your glutes at the top, ribs down, then lower with control." : {
+
     },
     "Squeeze your glutes hard at the top. Ribs stay down." : {
       "localizations" : {
@@ -22265,6 +22689,9 @@
           }
         }
       }
+    },
+    "Stay hinged. Keep your chest down" : {
+
     },
     "Stay tall. Keep your torso upright" : {
       "localizations" : {
@@ -23136,6 +23563,9 @@
         }
       }
     },
+    "The bar runs from your latest weigh-in to the goal. A loss in the week or month you pick gets a celebration. Reaching the goal earns the Goal weight badge." : {
+
+    },
     "The green band is the healthy weight for your height." : {
       "localizations" : {
         "ar" : {
@@ -23541,6 +23971,9 @@
           }
         }
       }
+    },
+    "This song couldn't play. Try the next one." : {
+
     },
     "This week" : {
       "localizations" : {
@@ -24296,6 +24729,9 @@
         }
       }
     },
+    "Training week" : {
+
+    },
     "Triceps" : {
       "localizations" : {
         "ar" : {
@@ -24353,6 +24789,12 @@
           }
         }
       }
+    },
+    "Try again" : {
+
+    },
+    "Tuck your elbows a little" : {
+
     },
     "Turn side-on to the camera. Prop your phone at hip height, about 2 to 3 metres away." : {
       "localizations" : {
@@ -24934,6 +25376,9 @@
         }
       }
     },
+    "Upper back" : {
+
+    },
     "Upper chest" : {
       "localizations" : {
         "ar" : {
@@ -25049,6 +25494,9 @@
           }
         }
       }
+    },
+    "Use the scheduled plan" : {
+
     },
     "Voice coaching" : {
       "localizations" : {
@@ -25166,6 +25614,9 @@
         }
       }
     },
+    "Watching: %@" : {
+
+    },
     "We couldn't start the camera on this device." : {
       "localizations" : {
         "ar" : {
@@ -25281,6 +25732,12 @@
           }
         }
       }
+    },
+    "Week" : {
+
+    },
+    "Weekly" : {
+
     },
     "Weigh in to track loss by week and by month." : {
       "localizations" : {
@@ -25455,6 +25912,12 @@
           }
         }
       }
+    },
+    "Weight loss" : {
+
+    },
+    "Weight loss progress" : {
+
     },
     "Weight, workouts and exercises" : {
       "localizations" : {
@@ -25861,6 +26324,9 @@
           }
         }
       }
+    },
+    "Workout music" : {
+
     },
     "workouts" : {
       "localizations" : {
@@ -26392,6 +26858,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "你不需要完美的一周。你需要今天。"
+          }
+        }
+      }
+    },
+    "You reached %@ %@. The badge stays on your home screen." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You reached %1$@ %2$@. The badge stays on your home screen."
           }
         }
       }

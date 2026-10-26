@@ -479,6 +479,7 @@ struct WeightLogSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \WeightEntry.date, order: .reverse) private var entries: [WeightEntry]
     @AppStorage("goalWeightKg") private var goalWeightKg = 0.0
+    @AppStorage(WeightLoss.startKey) private var lossStartKg = 0.0
     @AppStorage("heightCm") private var heightCm = 0.0
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
     @AppStorage("heightUnit") private var heightUnitRaw = Measure.Height.centimeters.rawValue
@@ -688,7 +689,10 @@ struct WeightLogSheet: View {
         if goalText.trimmingCharacters(in: .whitespaces).isEmpty {
             goalWeightKg = 0
         } else if let shownGoal = Measure.number(goalText), weightUnit.accepts(shownGoal) {
-            goalWeightKg = weightUnit.toKilograms(shownGoal)
+            let goal = weightUnit.toKilograms(shownGoal)
+            let changed = abs(goal - goalWeightKg) > 0.05
+            goalWeightKg = goal
+            lossStartKg = WeightLoss.rememberStart(kg, replacing: lossStartKg, goalChanged: changed)
         } else {
             error = String(localized: "Enter a goal between \(weightUnit.rangeDescription), or leave it blank.")
             return

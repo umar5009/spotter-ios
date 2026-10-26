@@ -104,6 +104,7 @@ struct WorkoutPlan {
     var lockedCount: Int
 
     var estimatedMinutes: Int {
+        guard !items.isEmpty else { return 0 }
         let seconds = items.reduce(0) { $0 + $1.sets * (45 + $1.restSeconds) }
         return max(5, seconds / 60)
     }
@@ -122,27 +123,44 @@ enum PlanBuilder {
     }
 
     static func today(place: TrainingPlace, level: Level, goal: Goal, isPro: Bool, date: Date = .now) -> WorkoutPlan {
-        plan(on: date, place: place, level: level, goal: goal, isPro: isPro)
+        plan(on: date, place: place, level: level, goal: goal, isPro: isPro, split: nil)
     }
 
     /// The session scheduled for a calendar day. Each weekday has its own exercises.
-    static func plan(on date: Date, place: TrainingPlace, level: Level, goal: Goal, isPro: Bool) -> WorkoutPlan {
-        let template = template(for: date, place: place)
-        let rest: Int
-        switch goal {
-        case .fatLoss: rest = 40
-        case .strength: rest = level == .beginner ? 60 : 90
-        default: rest = 60
+    static func plan(on date: Date, place: TrainingPlace, level: Level, goal: Goal, isPro: Bool, split: String? = nil) -> WorkoutPlan {
+        let raw = split ?? UserDefaults.standard.string(forKey: WeekSplit.storageKey) ?? ""
+        let template = template(for: date, place: place, split: raw)
+        let rest = restSeconds(goal: goal, level: level)
+        guard !template.ids.isEmpty else {
+            return WorkoutPlan(title: template.title, focus: template.blurb, items: [], lockedCount: 0)
         }
 
         let items = template.ids.map { make($0, level: level, rest: rest) }
+        let locked = isPro ? 0 : items.filter { !ExerciseLibrary.freeIDs.contains($0.exerciseID) }.count
+        return WorkoutPlan(title: template.title, focus: template.blurb, items: items, lockedCount: locked)
+    }
+
+    /// Replaces the scheduled exercise list when the user changed that day.
+    static func applying(_ ids: [String]?, onto scheduled: WorkoutPlan, level: Level, goal: Goal, isPro: Bool) -> WorkoutPlan {
+        guard let ids, !ids.isEmpty else { return scheduled }
+        let rest = scheduled.items.first?.restSeconds ?? restSeconds(goal: goal, level: level)
         if isPro {
-            return WorkoutPlan(title: template.title, focus: template.blurb, items: items, lockedCount: 0)
+            let items = ids.map { make($0, level: level, rest: rest) }
+            return WorkoutPlan(title: scheduled.title, focus: scheduled.focus, items: items, lockedCount: 0)
         }
-        let free = items.filter { ExerciseLibrary.freeIDs.contains($0.exerciseID) }
-        let locked = items.count - free.count
-        let visible = free.isEmpty ? [make("squat", level: level, rest: rest)] : free
-        return WorkoutPlan(title: template.title, focus: template.blurb, items: visible, lockedCount: locked)
+        let allowed = ids.filter { ExerciseLibrary.freeIDs.contains($0) }
+        let locked = ids.count - allowed.count
+        let visibleIDs = allowed.isEmpty ? ["squat"] : allowed
+        let items = visibleIDs.map { make($0, level: level, rest: rest) }
+        return WorkoutPlan(title: scheduled.title, focus: scheduled.focus, items: items, lockedCount: locked)
+    }
+
+    private static func restSeconds(goal: Goal, level: Level) -> Int {
+        switch goal {
+        case .fatLoss: return 40
+        case .strength: return level == .beginner ? 60 : 90
+        default: return 60
+        }
     }
 
     private struct DayTemplate {
@@ -163,16 +181,19 @@ enum PlanBuilder {
 
     private static let gymDays: [DayTemplate] = [
         DayTemplate(title: String(localized: "Squat & Press"), blurb: String(localized: "A heavy lower pattern and an overhead press."), ids: ["squat", "overheadPress", "plank"]),
-        DayTemplate(title: String(localized: "Hinge"), blurb: String(localized: "Romanian deadlifts and lunges."), ids: ["rdl", "lunge", "gluteBridge"]),
-        DayTemplate(title: String(localized: "Push"), blurb: String(localized: "Pressing strength, then shoulders."), ids: ["overheadPress", "pushUp", "lateralRaise"]),
-        DayTemplate(title: String(localized: "Lower Strength"), blurb: String(localized: "Squat and hinge on the same day."), ids: ["squat", "rdl", "lunge"]),
-        DayTemplate(title: String(localized: "Shoulders & Arms"), blurb: String(localized: "Raises, curls, and a press."), ids: ["lateralRaise", "bicepCurl", "overheadPress", "plank"]),
-        DayTemplate(title: String(localized: "Gym Full Body"), blurb: String(localized: "One lift from each pattern."), ids: ["squat", "rdl", "pushUp", "plank"]),
+        DayTemplate(title: String(localized: "Hinge"), blurb: String(localized: "Romanian deadlifts, hip thrusts and lunges."), ids: ["rdl", "hipThrust", "lunge"]),
+        DayTemplate(title: String(localized: "Push"), blurb: String(localized: "Bench, then shoulders."), ids: ["bench", "overheadPress", "lateralRaise"]),
+        DayTemplate(title: String(localized: "Lower Strength"), blurb: String(localized: "Squat, hinge, then hips."), ids: ["squat", "rdl", "hipThrust"]),
+        DayTemplate(title: String(localized: "Shoulders & Arms"), blurb: String(localized: "A row, then raises, curls and a press."), ids: ["row", "lateralRaise", "bicepCurl", "overheadPress"]),
+        DayTemplate(title: String(localized: "Gym Full Body"), blurb: String(localized: "Squat, bench and a row."), ids: ["squat", "bench", "row", "plank"]),
         DayTemplate(title: String(localized: "Core"), blurb: String(localized: "A short day. Show up, then rest."), ids: ["plank", "gluteBridge", "pushUp"])
     ]
 
-    private static func template(for date: Date, place: TrainingPlace) -> DayTemplate {
+    private static func template(for date: Date, place: TrainingPlace, split raw: String) -> DayTemplate {
         let index = mondayIndex(date)
+        if let focus = WeekSplit.focus(weekday: index, in: raw) {
+            return DayTemplate(title: focus.dayName, blurb: focus.detail, ids: focus.exerciseIDs(place: place))
+        }
         switch place {
         case .home:
             return homeDays[index]
@@ -182,6 +203,16 @@ enum PlanBuilder {
             let gymDay = index == 0 || index == 2 || index == 4
             return (gymDay ? gymDays : homeDays)[index]
         }
+    }
+
+    static func chipLabel(on date: Date, place: TrainingPlace, split raw: String) -> String {
+        if let focus = WeekSplit.focus(weekday: mondayIndex(date), in: raw) { return focus.shortTitle }
+        let index = mondayIndex(date)
+        let gym = place == .gym || (place == .both && (index == 0 || index == 2 || index == 4))
+        if gym {
+            return [String(localized: "Legs"), String(localized: "Legs"), String(localized: "Push"), String(localized: "Legs"), String(localized: "Delts"), String(localized: "Full"), String(localized: "Core")][index]
+        }
+        return [String(localized: "Full"), String(localized: "Legs"), String(localized: "Push"), String(localized: "Full"), String(localized: "Legs"), String(localized: "Push"), String(localized: "Rest")][index]
     }
 
     static func make(_ id: String, level: Level, rest: Int) -> PlannedExercise {

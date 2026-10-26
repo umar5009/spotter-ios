@@ -16,6 +16,9 @@ struct TrainerView: View {
     @State private var confirmExit = false
     @AppStorage("voiceEnabled") private var voiceEnabled = true
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
+    @StateObject private var music = WorkoutMusicPlayer()
+    @State private var showMusicLibrary = false
+    @State private var musicControlsVisible = false
 
     init(workout: ActiveWorkout) {
         self.workout = workout
@@ -70,7 +73,10 @@ struct TrainerView: View {
         .onAppear(perform: start)
         .onDisappear(perform: stop)
         .onChange(of: session.stage) { _, newStage in
-            if newStage == .finished { persist() }
+            if newStage == .finished {
+                music.stop()
+                persist()
+            }
         }
         .confirmationDialog("End this workout?", isPresented: $confirmExit, titleVisibility: .visible) {
             Button("Save and finish") {
@@ -94,15 +100,45 @@ struct TrainerView: View {
             VStack(spacing: 0) {
                 topBar
                 planProgress.padding(.top, 12)
-                CueBanner(cue: session.cue).padding(.top, 14)
+                if session.spec.category == .gym, !showMusicLibrary {
+                    LoadStepper(session: session)
+                        .padding(.top, 8)
+                }
+                if showMusicLibrary {
+                    WorkoutMusicLibrary(player: music, controlsVisible: $musicControlsVisible, isPresented: $showMusicLibrary)
+                        .padding(.top, 8)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                } else {
+                if music.currentTrack == nil {
+                    HStack {
+                        musicButton
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.top, 8)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+                if music.currentTrack != nil {
+                    NowPlayingStrip(player: music, controlsVisible: $musicControlsVisible) {
+                        withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) {
+                            showMusicLibrary = true
+                        }
+                    }
+                    .padding(.top, 6)
+                }
+                CueBanner(cue: session.cue).padding(.top, 10)
                 if demo != nil {
                     Pill(text: "Simulator demo · animated squat", symbol: "sparkles", color: Theme.violet).padding(.top, 8)
                 }
                 Spacer()
                 bottomArea
+                }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
+            .animation(.spring(response: 0.35, dampingFraction: 0.88), value: music.currentTrack?.id)
+            .animation(.spring(response: 0.32, dampingFraction: 0.86), value: musicControlsVisible)
+            .animation(.spring(response: 0.35, dampingFraction: 0.88), value: music.isPlaying)
 
             if session.stage == .active && !session.isHold {
                 HStack {
@@ -118,7 +154,19 @@ struct TrainerView: View {
                 CountdownView(number: n)
                     .transition(.scale.combined(with: .opacity))
             }
+
         }
+    }
+
+    private var musicButton: some View {
+        MusicSidebarButton(playing: music.isPlaying, libraryOpen: showMusicLibrary) {
+            SpotterAnalytics.click(showMusicLibrary ? "close_workout_music" : "open_workout_music", screen: "workout")
+            Haptics.tap()
+            withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) {
+                showMusicLibrary.toggle()
+            }
+        }
+        .fixedSize()
     }
 
     private var topBar: some View {
@@ -176,7 +224,7 @@ struct TrainerView: View {
     private var bottomArea: some View {
         switch session.stage {
         case .framing:
-            FramingCard(spec: session.spec, inFrame: session.inFrame)
+            FramingCard(session: session)
         case .countdown, .active:
             activePanel
         case .resting(let seconds):
@@ -246,12 +294,14 @@ struct TrainerView: View {
             }
             camera.requestAccessAndStart()
         }
-        session.begin()
+        let sets = (try? modelContext.fetch(FetchDescriptor<SetLog>())) ?? []
+        session.begin(watching: FaultMemory.cues(from: sets))
         SpotterAnalytics.screen("workout")
     }
 
     private func stop() {
         UIApplication.shared.isIdleTimerDisabled = false
+        music.stop()
         camera.onPose = nil
         camera.stop()
         demo?.stop()
@@ -351,11 +401,56 @@ struct CountdownView: View {
     }
 }
 
-struct FramingCard: View {
-    let spec: ExerciseSpec
-    let inFrame: Bool
+struct LoadStepper: View {
+    @ObservedObject var session: TrainerSession
+    @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
+
+    private var unit: Measure.Weight { Measure.Weight(rawValue: weightUnitRaw) ?? .kilograms }
 
     var body: some View {
+        HStack(spacing: 10) {
+            Text("Load")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(.white.opacity(0.7))
+            Spacer(minLength: 0)
+            stepButton("minus") { session.adjustLoad(by: -1, unit: unit) }
+            Text(label)
+                .font(.system(size: 15, weight: .bold).monospacedDigit())
+                .foregroundStyle(.white)
+                .frame(minWidth: 72)
+            stepButton("plus") { session.adjustLoad(by: 1, unit: unit) }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.08), in: Capsule())
+    }
+
+    private var label: String {
+        guard session.weightKg > 0 else { return String(localized: "Set") }
+        return "\(Measure.format(unit.fromKilograms(session.weightKg))) \(unit.symbol)"
+    }
+
+    private func stepButton(_ symbol: String, action: @escaping () -> Void) -> some View {
+        Button {
+            SpotterAnalytics.click("adjust_load", screen: "workout", ["direction": symbol])
+            action()
+            Haptics.tap()
+        } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 28, height: 28)
+                .background(Color.white.opacity(0.12), in: Circle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct FramingCard: View {
+    @ObservedObject var session: TrainerSession
+
+    var body: some View {
+        let spec = session.spec
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 Image(systemName: spec.camera.symbol)
@@ -372,16 +467,24 @@ struct FramingCard: View {
                 .font(.system(size: 15))
                 .foregroundStyle(.white.opacity(0.8))
                 .fixedSize(horizontal: false, vertical: true)
+            if let focus = session.focusCue {
+                HStack(spacing: 8) {
+                    Image(systemName: "target").foregroundStyle(Theme.warn)
+                    Text(String(localized: "Watching: \(focus)"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+            }
             HStack(spacing: 8) {
-                Circle().fill(inFrame ? Theme.accent : Theme.warn).frame(width: 9, height: 9)
-                Text(inFrame ? String(localized: "Got you. Hold still…") : String(localized: "Step back until your whole body is visible"))
+                Circle().fill(session.inFrame ? Theme.accent : Theme.warn).frame(width: 9, height: 9)
+                Text(session.inFrame ? String(localized: "Got you. Hold still…") : String(localized: "Step back until your whole body is visible"))
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 9)
             .background(Color.white.opacity(0.08), in: Capsule())
-            .animation(.easeInOut, value: inFrame)
+            .animation(.easeInOut, value: session.inFrame)
         }
         .padding(18)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))

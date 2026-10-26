@@ -119,9 +119,7 @@ struct ProgressScreen: View {
                         weightTile("This month", snap.monthDelta)
                     }
                     if goalWeightKg > 0 {
-                        Text("Goal \(Measure.format(weightUnit.fromKilograms(goalWeightKg))) \(weightUnit.symbol)")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Theme.textSecondary)
+                        WeightLossTrack(entries: weights)
                     }
                     BMIReadout(weightKg: latest.weightKg, heightCm: heightCm) {
                         SpotterAnalytics.click("log_weight", screen: "progress", ["source": "add_height"])

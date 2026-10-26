@@ -12,6 +12,21 @@ struct ProfileView: View {
     @AppStorage("onboarded") private var onboarded = true
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
     @AppStorage("heightUnit") private var heightUnitRaw = Measure.Height.centimeters.rawValue
+    @AppStorage(DayReminder.hourKey) private var reminderHour = 8
+    @AppStorage(DayReminder.minuteKey) private var reminderMinute = 0
+
+    private var reminderTime: Binding<Date> {
+        Binding(
+            get: {
+                Calendar.current.date(from: DateComponents(hour: reminderHour, minute: reminderMinute)) ?? .now
+            },
+            set: { date in
+                let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
+                reminderHour = parts.hour ?? 8
+                reminderMinute = parts.minute ?? 0
+            }
+        )
+    }
 
     var body: some View {
         NavigationStack {
@@ -58,14 +73,17 @@ struct ProfileView: View {
                 .onChange(of: goalRaw) { _, value in
                     SpotterAnalytics.click("plan_goal", screen: "profile", ["value": value])
                     SpotterAnalytics.sync(isPro: store.isPro)
+                    Task { await DayReminder.reschedule() }
                 }
                 .onChange(of: placeRaw) { _, value in
                     SpotterAnalytics.click("plan_place", screen: "profile", ["value": value])
                     SpotterAnalytics.sync(isPro: store.isPro)
+                    Task { await DayReminder.reschedule() }
                 }
                 .onChange(of: levelRaw) { _, value in
                     SpotterAnalytics.click("plan_level", screen: "profile", ["value": value])
                     SpotterAnalytics.sync(isPro: store.isPro)
+                    Task { await DayReminder.reschedule() }
                 }
 
                 Section {
@@ -103,8 +121,15 @@ struct ProfileView: View {
                             Task { await push.setEnabled(on) }
                         }
                     ))
+                    DatePicker("Reminder time", selection: reminderTime, displayedComponents: .hourAndMinute)
                 } header: { Text("Notifications") } footer: {
-                    Text("Reminders and updates. Turn them off here, or in iOS Settings.")
+                    Text("A reminder each day names that day's exercises. Turn them off here, or in iOS Settings.")
+                }
+                .onChange(of: reminderHour) { _, _ in
+                    Task { await DayReminder.reschedule() }
+                }
+                .onChange(of: reminderMinute) { _, _ in
+                    Task { await DayReminder.reschedule() }
                 }
 
                 Section {

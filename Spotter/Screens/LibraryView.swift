@@ -3,6 +3,7 @@ import SwiftUI
 struct LibraryView: View {
     @EnvironmentObject private var store: StoreManager
     @State private var filter: Filter = .all
+    @State private var showWeekPlan = false
 
     enum Filter: String, CaseIterable, Identifiable {
         case all = "All", home = "Home", gym = "Gym"
@@ -28,6 +29,7 @@ struct LibraryView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    weekCard
                     Picker("Filter", selection: $filter) {
                         ForEach(Filter.allCases) { Text($0.title).tag($0) }
                     }
@@ -54,7 +56,35 @@ struct LibraryView: View {
             .navigationDestination(for: String.self) { id in
                 ExerciseDetailView(exerciseID: id)
             }
+            .sheet(isPresented: $showWeekPlan) {
+                WeekPlanView()
+            }
         }
+    }
+
+    private var weekCard: some View {
+        Button {
+            SpotterAnalytics.click("open_week_plan", screen: "exercises")
+            showWeekPlan = true
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "calendar")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.black)
+                    .frame(width: 44, height: 44)
+                    .background(Theme.accent, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Training week").font(.display(16, weight: .bold)).foregroundStyle(.white)
+                    Text("Set chest, back, legs, and the other days").font(.subheadline).foregroundStyle(Theme.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").foregroundStyle(Theme.textTertiary)
+            }
+            .padding(14)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Theme.stroke))
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -165,8 +195,8 @@ struct ExerciseDetailView: View {
                         if spec.category == .gym {
                             Divider().overlay(Theme.stroke)
                             stepperRow("Weight", control: "weight", value: weight == 0 ? "–" : "\(Measure.format(weightUnit.fromKilograms(weight))) \(weightUnit.symbol)",
-                                       minus: { weight = max(0, weight - weightUnit.toKilograms(weightUnit.step)) },
-                                       plus: { weight += weightUnit.toKilograms(weightUnit.step) })
+                                       minus: { weight = LiftLoad.stepped(weight, direction: -1, unit: weightUnit) },
+                                       plus: { weight = LiftLoad.stepped(weight, direction: 1, unit: weightUnit) })
                         }
                     }
                 }
@@ -199,11 +229,18 @@ struct ExerciseDetailView: View {
         }
         .onAppear {
             guard !configured else { return }
-            configured = true
             let level = Level(rawValue: levelRaw) ?? .beginner
             let planned = PlanBuilder.make(spec.id, level: level, rest: 60)
             sets = planned.sets
             target = planned.target
+            if spec.category == .gym {
+                weight = LiftLoad.kilograms(for: spec.id)
+            }
+            configured = true
+        }
+        .onChange(of: weight) { _, new in
+            guard configured, spec.category == .gym else { return }
+            LiftLoad.save(new, for: spec.id)
         }
     }
 

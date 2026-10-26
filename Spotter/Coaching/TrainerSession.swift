@@ -44,6 +44,7 @@ final class TrainerSession: ObservableObject {
     @Published private(set) var inFrame = false
     @Published private(set) var results: [SetResult] = []
     @Published var weightKg: Double
+    @Published private(set) var focusCue: String?
 
     let plan: [PlannedExercise]
     let title: String
@@ -59,6 +60,7 @@ final class TrainerSession: ObservableObject {
     private var cueClear: DispatchWorkItem?
     private var perfectStreak = 0
     private var lastHoldAnnouncement = 0
+    private var watched: [String: String] = [:]
     private let voice = VoiceCoach.shared
 
     var current: PlannedExercise { plan[index] }
@@ -73,11 +75,24 @@ final class TrainerSession: ObservableObject {
         self.plan = plan
         self.title = title
         self.analyzer = ExerciseAnalyzer(spec: ExerciseLibrary.spec(plan[0].exerciseID))
-        self.weightKg = plan[0].weightKg ?? 0
+        self.weightKg = LiftLoad.resolved(plan[0])
     }
 
-    func begin() {
-        voice.say(String(localized: "Let's set up. \(spec.camera.instruction)"), key: "setup", cooldown: 0, priority: true)
+    func begin(watching: [String: String]) {
+        watched = watching
+        refreshFocus()
+        voice.say(openingLine(setup: true), key: "setup", cooldown: 0, priority: true)
+    }
+
+    func adjustLoad(by direction: Int, unit: Measure.Weight) {
+        setLoad(LiftLoad.stepped(weightKg, direction: direction, unit: unit))
+    }
+
+    func setLoad(_ kilograms: Double) {
+        let clamped = max(0, min(500, kilograms))
+        weightKg = clamped
+        guard spec.category == .gym else { return }
+        LiftLoad.save(clamped, for: spec.id)
     }
 
     // MARK: - Frame handling
@@ -116,7 +131,8 @@ final class TrainerSession: ObservableObject {
             if abs(feedback.progress - progress) > 0.01 { progress = feedback.progress }
             setFaultJoints(joints(for: feedback.activeFaults))
 
-            if let fault = feedback.activeFaults.first {
+            let ordered = preferred(feedback.activeFaults)
+            if let fault = ordered.first {
                 show(Cue(text: fault.cue, kind: .warn))
                 voice.say(fault.cue, key: fault.id, cooldown: 5)
             }
@@ -185,7 +201,7 @@ final class TrainerSession: ObservableObject {
 
         var spoken = ["\(repCount)"]
         let remaining = target - repCount
-        if let fault = result.faults.first {
+        if let fault = preferred(result.faults).first {
             spoken.append(fault)
             perfectStreak = 0
             show(Cue(text: fault, kind: .warn))
@@ -217,6 +233,10 @@ final class TrainerSession: ObservableObject {
         results.append(SetResult(exerciseID: spec.id, exerciseName: spec.name, setNumber: setNumber,
                                  reps: isHold ? 0 : repCount, holdSeconds: Int(holdSeconds),
                                  avgScore: average, faults: faults, weightKg: weightKg))
+        if let cue = watched[spec.id], faults[cue] == nil {
+            watched.removeValue(forKey: spec.id)
+        }
+        refreshFocus()
         Haptics.success()
         setFaultJoints([])
 
@@ -247,11 +267,12 @@ final class TrainerSession: ObservableObject {
         index += 1
         setNumber = 1
         analyzer = ExerciseAnalyzer(spec: spec)
-        weightKg = current.weightKg ?? 0
+        weightKg = LiftLoad.resolved(current)
         resetSetState()
+        refreshFocus()
         inFrameSince = nil
         stage = .framing
-        voice.say(String(localized: "Next up: \(spec.name). \(spec.camera.instruction)"), key: "next", cooldown: 0, priority: true)
+        voice.say(openingLine(setup: false), key: "next", cooldown: 0, priority: true)
     }
 
     func finish() {
@@ -302,6 +323,33 @@ final class TrainerSession: ObservableObject {
         timer?.invalidate()
         setNumber += 1
         startCountdown()
+    }
+
+    private func refreshFocus() {
+        let next = watched[spec.id]
+        if focusCue != next { focusCue = next }
+    }
+
+    private func openingLine(setup: Bool) -> String {
+        let base = setup
+            ? String(localized: "Let's set up. \(spec.camera.instruction)")
+            : String(localized: "Next up: \(spec.name). \(spec.camera.instruction)")
+        guard let cue = watched[spec.id] else { return base }
+        return base + " " + String(localized: "Last time: \(cue).")
+    }
+
+    private func preferred(_ rules: [FormRule]) -> [FormRule] {
+        guard let watch = watched[spec.id], let index = rules.firstIndex(where: { $0.cue == watch }) else { return rules }
+        var copy = rules
+        copy.insert(copy.remove(at: index), at: 0)
+        return copy
+    }
+
+    private func preferred(_ cues: [String]) -> [String] {
+        guard let watch = watched[spec.id], let index = cues.firstIndex(of: watch) else { return cues }
+        var copy = cues
+        copy.insert(copy.remove(at: index), at: 0)
+        return copy
     }
 
     private func resetSetState() {

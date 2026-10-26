@@ -1,11 +1,57 @@
 import Foundation
 
-/// A short note that changes once per calendar day, picked from the user's goal.
+/// A short note for one calendar day, built from that day's exercises.
+struct DayNote: Equatable {
+    var title: String
+    var body: String
+}
+
 enum DailyQuote {
-    static func line(goal: Goal, date: Date = .now, calendar: Calendar = .current) -> String {
-        let pool = quotes(for: goal)
+    static func note(goal: Goal, title: String, names: [String], focus: TrainingFocus?, date: Date, calendar: Calendar = .current) -> DayNote {
+        let label = focus?.dayName ?? title
         let day = calendar.ordinality(of: .day, in: .year, for: date) ?? 1
-        return pool[(day - 1) % pool.count]
+        let closer = closer(goal: goal, focus: focus, slot: day - 1)
+        let body: String
+        if names.isEmpty {
+            body = closer
+        } else {
+            body = String(localized: "\(exercisePhrase(names)). \(closer)")
+        }
+        return DayNote(title: label, body: body)
+    }
+
+    static func line(goal: Goal, title: String, names: [String], focus: TrainingFocus?, date: Date, calendar: Calendar = .current) -> String {
+        let note = note(goal: goal, title: title, names: names, focus: focus, date: date, calendar: calendar)
+        return String(localized: "\(note.title). \(note.body)")
+    }
+
+    private static func exercisePhrase(_ names: [String]) -> String {
+        switch names.count {
+        case 0:
+            return ""
+        case 1:
+            return names[0]
+        case 2:
+            return String(localized: "\(names[0]) and \(names[1])")
+        case 3:
+            return String(localized: "\(names[0]), \(names[1]), and \(names[2])")
+        default:
+            let extra = names.count - 3
+            return String(localized: "\(names[0]), \(names[1]), and \(names[2]), plus \(extra) more")
+        }
+    }
+
+    private static func closer(goal: Goal, focus: TrainingFocus?, slot: Int) -> String {
+        if focus == .rest {
+            switch slot {
+            case 0: return String(localized: "Move, then stop.")
+            case 1: return String(localized: "Easy on purpose.")
+            case 2: return String(localized: "Recovery still counts.")
+            default: return String(localized: "A short day keeps the streak. Zero does not.")
+            }
+        }
+        let pool = quotes(for: goal)
+        return pool[slot % pool.count]
     }
 
     private static func quotes(for goal: Goal) -> [String] {

@@ -4,7 +4,7 @@ import CoreGraphics
 /// All supported exercises and their AI form checks.
 /// Thresholds are tuned for typical adult proportions; adjust here to make coaching stricter or looser.
 enum ExerciseLibrary {
-    static let all: [ExerciseSpec] = [squat, pushUp, plank, lunge, gluteBridge, romanianDeadlift, overheadPress, bicepCurl, lateralRaise]
+    static let all: [ExerciseSpec] = [squat, pushUp, plank, lunge, gluteBridge, romanianDeadlift, hipThrust, benchPress, bentOverRow, overheadPress, bicepCurl, lateralRaise]
     static let freeIDs: Set<String> = Set(all.filter(\.isFree).map(\.id))
 
     static func spec(_ id: String) -> ExerciseSpec { all.first { $0.id == id } ?? squat }
@@ -236,4 +236,79 @@ enum ExerciseLibrary {
             String(localized: "Raise out to the sides until your arms reach shoulder height."),
             String(localized: "Lower slowly. No shrugging.")
         ])
+
+    static let benchPress = ExerciseSpec(
+        id: "bench", name: String(localized: "Bench Press"), category: .gym,
+        equipment: String(localized: "Barbell · Dumbbells"),
+        muscles: [String(localized: "Chest"), String(localized: "Triceps"), String(localized: "Shoulders")],
+        symbol: "figure.strengthtraining.traditional",
+        camera: .side, isFree: false,
+        required: [.shoulder, .elbow, .wrist, .hip], bothSidesRequired: false,
+        kind: .reps(RepConfig(
+            metric: { p, s in p.elbowAngle(s) },
+            restIsHigh: true, rest: 155, peak: 90,
+            partialCue: String(localized: "Lower the bar until it reaches your chest."),
+            eccentric: .towardPeak, minEccentricSeconds: 0.8)),
+        rules: [
+            FormRule(id: "bench.elbow", cue: String(localized: "Tuck your elbows a little"), when: .bottom, penalty: 15,
+                     highlight: [.elbow, .shoulder]) { p, s in (p.armToTorso(s) ?? 0) > 85 }
+        ],
+        steps: [
+            String(localized: "Lie on the bench, feet flat, eyes under the bar."),
+            String(localized: "Grip just outside your shoulders and unrack with straight wrists."),
+            String(localized: "Lower the bar to your mid-chest. Elbows stay under the bar."),
+            String(localized: "Press up until your arms lock out. Keep your hips on the bench.")
+        ],
+        note: String(localized: "Film from the side, at bench height, so Spotter can see your elbow and hip."))
+
+    static let bentOverRow = ExerciseSpec(
+        id: "row", name: String(localized: "Bent-over Row"), category: .gym,
+        equipment: String(localized: "Barbell · Dumbbells"),
+        muscles: [String(localized: "Upper back"), String(localized: "Lats"), String(localized: "Biceps")],
+        symbol: "figure.rowing",
+        camera: .side, isFree: false,
+        required: [.shoulder, .elbow, .wrist, .hip, .knee], bothSidesRequired: false,
+        kind: .reps(RepConfig(
+            metric: { p, s in p.elbowAngle(s) },
+            restIsHigh: true, rest: 155, peak: 70,
+            partialCue: String(localized: "Pull the weight all the way to your hip."),
+            eccentric: .towardRest, minEccentricSeconds: 0.8)),
+        rules: [
+            FormRule(id: "row.hinge", cue: String(localized: "Stay hinged. Keep your chest down"), when: .bottom, penalty: 15,
+                     highlight: [.shoulder, .hip]) { p, s in (p.torsoLean(s) ?? 90) < 30 }
+        ],
+        steps: [
+            String(localized: "Hinge until your chest faces the floor, knees softly bent."),
+            String(localized: "Let the weight hang with a straight arm."),
+            String(localized: "Pull your elbow back until the weight reaches your hip."),
+            String(localized: "Lower slowly. Your torso stays still.")
+        ],
+        note: String(localized: "A phone camera can't reliably see if your back rounds. Keep a flat back and a weight you can hold still."))
+
+    static let hipThrust = ExerciseSpec(
+        id: "hipThrust", name: String(localized: "Hip Thrust"), category: .gym,
+        equipment: String(localized: "Barbell · Bench"),
+        muscles: [String(localized: "Glutes"), String(localized: "Hamstrings")],
+        symbol: "figure.flexibility",
+        camera: .side, isFree: false,
+        required: [.shoulder, .hip, .knee, .ankle], bothSidesRequired: false,
+        kind: .reps(RepConfig(
+            metric: { p, s in p.hipAngle(s) },
+            restIsHigh: false, rest: 105, peak: 165,
+            partialCue: String(localized: "Drive your hips all the way up and squeeze."),
+            eccentric: .towardRest, minEccentricSeconds: 0.8)),
+        rules: [
+            FormRule(id: "thrust.feet", cue: String(localized: "Set your feet so your knees bend to about 90°"), when: .bottom, penalty: 10,
+                     highlight: [.knee, .ankle]) { p, s in
+                guard let knee = p.kneeAngle(s) else { return false }
+                return knee < 60 || knee > 125
+            }
+        ],
+        steps: [
+            String(localized: "Shoulder blades on a bench, feet flat, hip-width apart."),
+            String(localized: "Roll the weight into the crease of your hips."),
+            String(localized: "Drive through your heels until your hips are in line with your knees and shoulders."),
+            String(localized: "Squeeze your glutes at the top, ribs down, then lower with control.")
+        ],
+        note: String(localized: "Film from the side so Spotter can see your hip lock out."))
 }

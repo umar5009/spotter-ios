@@ -8,10 +8,10 @@ struct PaywallView: View {
     @State private var showClose = false
 
     private let benefits: [(String, String, String)] = [
-        ("camera.viewfinder", "Live form correction", "All 9 exercises, with real-time cues as you move"),
-        ("dumbbell.fill", "Gym mode", "Romanian deadlift, press, curls and raises, with tempo coaching"),
-        ("chart.line.uptrend.xyaxis", "Your personal plan", "Home and gym days that adapt to your form score"),
-        ("target", "Your #1 fix", "Form history that shows what to work on next")
+        ("camera.viewfinder", "Live form correction", "Every exercise, with real-time cues as you move"),
+        ("dumbbell.fill", "Gym mode", "Bench, rows, hip thrusts, presses and curls, with the load remembered"),
+        ("chart.line.uptrend.xyaxis", "Your personal plan", "Change today's workout, at home or in the gym"),
+        ("target", "Your #1 fix", "The next session watches the fault from last time")
     ]
 
     var body: some View {

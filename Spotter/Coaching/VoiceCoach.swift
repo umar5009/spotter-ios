@@ -1,19 +1,22 @@
 import AVFoundation
 import UIKit
 
-/// Spoken coaching. Rate-limited so cues never pile up, and ducks the user's music instead of stopping it.
-final class VoiceCoach {
+/// Spoken coaching. Rate-limited so cues never pile up, and ducks workout music instead of stopping it.
+final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate, @unchecked Sendable {
     static let shared = VoiceCoach()
 
     private let synthesizer = AVSpeechSynthesizer()
     private var lastSpoken: [String: Date] = [:]
     private var lastAny = Date.distantPast
+    private var activeUtterance: ObjectIdentifier?
 
     private var enabled: Bool {
         UserDefaults.standard.object(forKey: "voiceEnabled") as? Bool ?? true
     }
 
-    private init() {
+    private override init() {
+        super.init()
+        synthesizer.delegate = self
         let audio = AVAudioSession.sharedInstance()
         try? audio.setCategory(.playback, mode: .voicePrompt, options: [.duckOthers, .mixWithOthers])
     }
@@ -29,8 +32,6 @@ final class VoiceCoach {
         if let last = lastSpoken[k], now.timeIntervalSince(last) < cooldown { return }
         if !priority {
             if synthesizer.isSpeaking || now.timeIntervalSince(lastAny) < 1.2 { return }
-        } else if synthesizer.isSpeaking {
-            synthesizer.stopSpeaking(at: .immediate)
         }
         lastSpoken[k] = now
         lastAny = now
@@ -40,6 +41,11 @@ final class VoiceCoach {
         utterance.rate = 0.52
         utterance.pitchMultiplier = 1.0
         utterance.voice = Self.systemVoice
+        activeUtterance = ObjectIdentifier(utterance)
+        if priority, synthesizer.isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
+        WorkoutMusicPlayer.active?.setDucked(true)
         synthesizer.speak(utterance)
     }
 
@@ -56,7 +62,27 @@ final class VoiceCoach {
 
     func stop() {
         synthesizer.stopSpeaking(at: .immediate)
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        if WorkoutMusicPlayer.active?.holdsAudioSession != true {
+            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        }
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        DispatchQueue.main.async { [weak self] in
+            self?.releaseDuck(for: utterance)
+        }
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        DispatchQueue.main.async { [weak self] in
+            self?.releaseDuck(for: utterance)
+        }
+    }
+
+    private func releaseDuck(for utterance: AVSpeechUtterance) {
+        guard ObjectIdentifier(utterance) == activeUtterance else { return }
+        activeUtterance = nil
+        WorkoutMusicPlayer.active?.setDucked(false)
     }
 }
 

@@ -1,3 +1,4 @@
+import Darwin
 import FirebaseCore
 import FirebaseMessaging
 import SwiftUI
@@ -19,6 +20,28 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Messaging.messaging().apnsToken = deviceToken
+    }
+
+    /// iPhone Duo's open screen is landscape. A portrait-only app is letterboxed in the middle of it.
+    func application(
+        _ application: UIApplication,
+        supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
+        Self.isDuo ? .allButUpsideDown : .portrait
+    }
+
+    /// Cover and inner displays on iPhone Duo (iPhone19,4). Other iPhones stay portrait.
+    private static var isDuo: Bool {
+        let model = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] ?? hardwareModel
+        return model == "iPhone19,4"
+    }
+
+    private static var hardwareModel: String {
+        var system = utsname()
+        uname(&system)
+        return withUnsafePointer(to: &system.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: 1) { String(cString: $0) }
+        }
     }
 }
 
@@ -98,7 +121,10 @@ struct RootView: View {
             logScreen()
         }
         .onChange(of: onboarded) { _, done in if done { logScreen() } }
-        .onChange(of: store.isPro) { _, pro in SpotterAnalytics.sync(isPro: pro) }
+        .onChange(of: store.isPro) { _, pro in
+            SpotterAnalytics.sync(isPro: pro)
+            Task { await DayReminder.reschedule() }
+        }
         .onChange(of: push.pendingRoute) { _, route in
             guard let route else { return }
             open(route)
@@ -106,6 +132,7 @@ struct RootView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             push.refreshAuthorization()
+            Task { await DayReminder.reschedule() }
         }
     }
 
@@ -178,5 +205,6 @@ struct RootView: View {
             PaywallView()
                 .environmentObject(store)
         }
+        .overlay { LossCelebrationLayer() }
     }
 }

@@ -52,6 +52,7 @@ final class StoreManager: ObservableObject {
             }
         }
         isPro = active || UserDefaults.standard.bool(forKey: "debugPro")
+        UserDefaults.standard.set(isPro, forKey: "cachedIsPro")
     }
 
     func purchase(_ product: Product) async -> Bool {

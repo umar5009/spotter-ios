@@ -1,93 +1,117 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "CFBundleDisplayName": {
-      "comment": "Bundle display name",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter"
           }
         }
       }
     },
-    "CFBundleName": {
-      "comment": "Bundle name",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter"
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter"
           }
         }
       }
     },
-    "NSCameraUsageDescription": {
-      "comment": "Privacy - Camera Usage Description",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter uses your camera to track your body position and correct your form in real time. Video is processed on your iPhone and never recorded or uploaded."
+    "NSAppleMusicUsageDescription" : {
+      "comment" : "Privacy - Media Library Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Spotter plays popular gym songs by singers from your country through Apple Music."
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Privacy - Camera Usage Description",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم Spotter الكاميرا لتتبع وضع جسمك وتصحيح أدائك في الوقت الحقيقي. تُعالَج الصورة على iPhone ولا يُسجَّل فيديو ولا يُرفع أبدًا."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter usa la cámara para seguir la posición de tu cuerpo y corregir tu técnica en tiempo real. El vídeo se procesa en tu iPhone y nunca se graba ni se sube."
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter nutzt die Kamera, um deine Körperposition zu verfolgen und deine Form in Echtzeit zu korrigieren. Das Video wird auf deinem iPhone verarbeitet und nie aufgenommen oder hochgeladen."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter utilise la caméra pour suivre la position de votre corps et corriger votre technique en temps réel. La vidéo est traitée sur votre iPhone et n’est jamais enregistrée ni envoyée."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter uses your camera to track your body position and correct your form in real time. Video is processed on your iPhone and never recorded or uploaded."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter nutzt die Kamera, um deine Körperposition zu verfolgen und deine Form in Echtzeit zu korrigieren. Das Video wird auf deinem iPhone verarbeitet und nie aufgenommen oder hochgeladen."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter usa la cámara para seguir la posición de tu cuerpo y corregir tu técnica en tiempo real. El vídeo se procesa en tu iPhone y nunca se graba ni se sube."
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O Spotter usa a câmera para acompanhar a posição do seu corpo e corrigir sua técnica em tempo real. O vídeo é processado no seu iPhone e nunca é gravado ou enviado."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter utilise la caméra pour suivre la position de votre corps et corriger votre technique en temps réel. La vidéo est traitée sur votre iPhone et n’est jamais enregistrée ni envoyée."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter 使用相机实时追踪你的身体位置并纠正动作。视频在你的 iPhone 上处理，不会被录制或上传。"
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter आपके शरीर की स्थिति ट्रैक करने और फॉर्म को रीयल टाइम में सुधारने के लिए कैमरा इस्तेमाल करता है। वीडियो आपके iPhone पर प्रोसेस होता है और कभी रिकॉर्ड या अपलोड नहीं होता।"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotterはカメラで体の位置を追跡し、フォームをリアルタイムで修正します。動画はiPhone上で処理され、録画もアップロードもされません。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotterはカメラで体の位置を追跡し、フォームをリアルタイムで修正します。動画はiPhone上で処理され、録画もアップロードもされません。"
           }
         },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يستخدم Spotter الكاميرا لتتبع وضع جسمك وتصحيح أدائك في الوقت الحقيقي. تُعالَج الصورة على iPhone ولا يُسجَّل فيديو ولا يُرفع أبدًا."
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Spotter usa a câmera para acompanhar a posição do seu corpo e corrigir sua técnica em tempo real. O vídeo é processado no seu iPhone e nunca é gravado ou enviado."
           }
         },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter आपके शरीर की स्थिति ट्रैक करने और फॉर्म को रीयल टाइम में सुधारने के लिए कैमरा इस्तेमाल करता है। वीडियो आपके iPhone पर प्रोसेस होता है और कभी रिकॉर्ड या अपलोड नहीं होता।"
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter آپ کے جسم کی پوزیشن ٹریک کرنے اور فارم کو حقیقی وقت میں درست کرنے کے لیے کیمرہ استعمال کرتا ہے۔ ویڈیو آپ کے iPhone پر پروسیس ہوتی ہے اور کبھی ریکارڈ یا اپ لوڈ نہیں ہوتی۔"
           }
         },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spotter آپ کے جسم کی پوزیشن ٹریک کرنے اور فارم کو حقیقی وقت میں درست کرنے کے لیے کیمرہ استعمال کرتا ہے۔ ویڈیو آپ کے iPhone پر پروسیس ہوتی ہے اور کبھی ریکارڈ یا اپ لوڈ نہیں ہوتی۔"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotter 使用相机实时追踪你的身体位置并纠正动作。视频在你的 iPhone 上处理，不会被录制或上传。"
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Privacy - Location When In Use Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Spotter uses your location to choose popular gym songs from your country."
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
