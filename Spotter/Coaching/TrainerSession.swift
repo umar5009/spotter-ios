@@ -17,6 +17,8 @@ struct SetResult: Identifiable {
     let avgScore: Int
     let faults: [String: Int]
     let weightKg: Double
+    /// False when this set was rep-counted without live form coaching.
+    let coached: Bool
 
     var topFault: String? { faults.max { $0.value < $1.value }?.key }
 }
@@ -62,6 +64,10 @@ final class TrainerSession: ObservableObject {
     private var lastHoldAnnouncement = 0
     private var watched: [String: String] = [:]
     private let voice = VoiceCoach.shared
+    /// Exercise IDs that receive live form cues and form-score talk.
+    private let coachedIDs: Set<String>
+
+    var liveCoaching: Bool { coachedIDs.contains(spec.id) }
 
     var current: PlannedExercise { plan[index] }
     var spec: ExerciseSpec { ExerciseLibrary.spec(current.exerciseID) }
@@ -70,10 +76,11 @@ final class TrainerSession: ObservableObject {
     var nextSpec: ExerciseSpec? { index + 1 < plan.count ? ExerciseLibrary.spec(plan[index + 1].exerciseID) : nil }
     var currentExerciseResults: [SetResult] { results.filter { $0.exerciseID == current.exerciseID } }
 
-    init(plan: [PlannedExercise], title: String) {
+    init(plan: [PlannedExercise], title: String, coachedIDs: Set<String>) {
         precondition(!plan.isEmpty, "A workout needs at least one exercise")
         self.plan = plan
         self.title = title
+        self.coachedIDs = coachedIDs
         self.analyzer = ExerciseAnalyzer(spec: ExerciseLibrary.spec(plan[0].exerciseID))
         self.weightKg = LiftLoad.resolved(plan[0])
     }
@@ -129,21 +136,26 @@ final class TrainerSession: ObservableObject {
 
             let feedback = analyzer.process(pose)
             if abs(feedback.progress - progress) > 0.01 { progress = feedback.progress }
-            setFaultJoints(joints(for: feedback.activeFaults))
 
-            let ordered = preferred(feedback.activeFaults)
-            if let fault = ordered.first {
-                show(Cue(text: fault.cue, kind: .warn))
-                voice.say(fault.cue, key: fault.id, cooldown: 5)
+            if liveCoaching {
+                setFaultJoints(joints(for: feedback.activeFaults))
+                if let fault = preferred(feedback.activeFaults).first {
+                    show(Cue(text: fault.cue, kind: .warn))
+                    voice.say(fault.cue, key: fault.id, cooldown: 5)
+                }
+            } else {
+                setFaultJoints([])
             }
 
             if isHold { updateHold(feedback) }
 
             switch feedback.event {
-            case .rep(let result): registerRep(result)
+            case .rep(let result):
+                registerRep(result)
             case .partial(let text):
-                show(Cue(text: text, kind: .warn))
-                voice.say(text, key: "partial", cooldown: 3, priority: true)
+                let line = liveCoaching ? text : String(localized: "Finish the full range so it counts.")
+                show(Cue(text: line, kind: .warn))
+                voice.say(line, key: "partial", cooldown: 3, priority: true)
                 Haptics.warning()
             case nil: break
             }
@@ -180,8 +192,11 @@ final class TrainerSession: ObservableObject {
     private func updateHold(_ feedback: FrameFeedback) {
         holdSeconds = analyzer.holdSeconds
         if feedback.inPosition == false {
-            show(Cue(text: String(localized: "Get into position"), kind: .info))
-            if case .hold(let cfg) = spec.kind { voice.say(cfg.positionCue, key: "position", cooldown: 6) }
+            let line = String(localized: "Get into position")
+            show(Cue(text: line, kind: .info))
+            if liveCoaching, case .hold(let cfg) = spec.kind {
+                voice.say(cfg.positionCue, key: "position", cooldown: 6)
+            }
         }
         let remaining = target - Int(holdSeconds)
         if remaining != lastHoldAnnouncement {
@@ -194,25 +209,33 @@ final class TrainerSession: ObservableObject {
 
     private func registerRep(_ result: RepResult) {
         repCount += 1
-        lastRepScore = result.score
-        repScores.append(result.score)
-        for fault in result.faults { faultCounts[fault, default: 0] += 1 }
         Haptics.rep()
-
-        var spoken = ["\(repCount)"]
         let remaining = target - repCount
-        if let fault = preferred(result.faults).first {
-            spoken.append(fault)
-            perfectStreak = 0
-            show(Cue(text: fault, kind: .warn))
+
+        if liveCoaching {
+            lastRepScore = result.score
+            repScores.append(result.score)
+            for fault in result.faults { faultCounts[fault, default: 0] += 1 }
+            var spoken = ["\(repCount)"]
+            if let fault = preferred(result.faults).first {
+                spoken.append(fault)
+                perfectStreak = 0
+                show(Cue(text: fault, kind: .warn))
+            } else {
+                if result.score >= 90 { perfectStreak += 1 }
+                if perfectStreak > 0 && perfectStreak % 4 == 0 { spoken.append(String(localized: "Perfect form")) }
+                show(Cue(text: String(localized: "Great rep · \(result.score)"), kind: .good))
+            }
+            if remaining == 2 && target >= 6 { spoken.append(String(localized: "Two more")) }
+            if remaining == 1 && target >= 4 { spoken.append(String(localized: "Last one")) }
+            voice.say(spoken.joined(separator: ". "), key: "rep", cooldown: 0, priority: true)
         } else {
-            if result.score >= 90 { perfectStreak += 1 }
-            if perfectStreak > 0 && perfectStreak % 4 == 0 { spoken.append(String(localized: "Perfect form")) }
-            show(Cue(text: String(localized: "Great rep · \(result.score)"), kind: .good))
+            var spoken = ["\(repCount)"]
+            if remaining == 2 && target >= 6 { spoken.append(String(localized: "Two more")) }
+            if remaining == 1 && target >= 4 { spoken.append(String(localized: "Last one")) }
+            show(Cue(text: String(localized: "Rep \(repCount)"), kind: .good))
+            voice.say(spoken.joined(separator: ". "), key: "rep", cooldown: 0, priority: true)
         }
-        if remaining == 2 && target >= 6 { spoken.append(String(localized: "Two more")) }
-        if remaining == 1 && target >= 4 { spoken.append(String(localized: "Last one")) }
-        voice.say(spoken.joined(separator: ". "), key: "rep", cooldown: 0, priority: true)
 
         if repCount >= target { completeSet() }
     }
@@ -223,16 +246,19 @@ final class TrainerSession: ObservableObject {
         guard stage == .active else { return }
         let average: Int
         let faults: [String: Int]
-        if isHold {
+        if liveCoaching && isHold {
             average = analyzer.holdScore
             faults = analyzer.holdFaultCounts
-        } else {
+        } else if liveCoaching {
             average = repScores.isEmpty ? 0 : repScores.reduce(0, +) / repScores.count
             faults = faultCounts
+        } else {
+            average = 0
+            faults = [:]
         }
         results.append(SetResult(exerciseID: spec.id, exerciseName: spec.name, setNumber: setNumber,
                                  reps: isHold ? 0 : repCount, holdSeconds: Int(holdSeconds),
-                                 avgScore: average, faults: faults, weightKg: weightKg))
+                                 avgScore: average, faults: faults, weightKg: weightKg, coached: liveCoaching))
         if let cue = watched[spec.id], faults[cue] == nil {
             watched.removeValue(forKey: spec.id)
         }
@@ -241,10 +267,16 @@ final class TrainerSession: ObservableObject {
         setFaultJoints([])
 
         if setNumber < current.sets {
-            voice.say(String(localized: "Set \(setNumber) done. Form score \(average). Rest up."), key: "setDone", cooldown: 0, priority: true)
+            let line = liveCoaching
+                ? String(localized: "Set \(setNumber) done. Form score \(average). Rest up.")
+                : String(localized: "Set \(setNumber) done. Rest up.")
+            voice.say(line, key: "setDone", cooldown: 0, priority: true)
             startRest()
         } else {
-            voice.say(String(localized: "\(spec.name) complete. Average form \(average)."), key: "exerciseDone", cooldown: 0, priority: true)
+            let line = liveCoaching
+                ? String(localized: "\(spec.name) complete. Average form \(average).")
+                : String(localized: "\(spec.name) complete.")
+            voice.say(line, key: "exerciseDone", cooldown: 0, priority: true)
             timer?.invalidate()
             stage = .exerciseDone
         }
@@ -326,7 +358,7 @@ final class TrainerSession: ObservableObject {
     }
 
     private func refreshFocus() {
-        let next = watched[spec.id]
+        let next = liveCoaching ? watched[spec.id] : nil
         if focusCue != next { focusCue = next }
     }
 
@@ -334,7 +366,7 @@ final class TrainerSession: ObservableObject {
         let base = setup
             ? String(localized: "Let's set up. \(spec.camera.instruction)")
             : String(localized: "Next up: \(spec.name). \(spec.camera.instruction)")
-        guard let cue = watched[spec.id] else { return base }
+        guard liveCoaching, let cue = watched[spec.id] else { return base }
         return base + " " + String(localized: "Last time: \(cue).")
     }
 

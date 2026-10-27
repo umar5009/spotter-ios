@@ -20,9 +20,15 @@ struct TrainerView: View {
     @State private var showMusicLibrary = false
     @State private var musicControlsVisible = false
 
+    @State private var showCoachPaywall = false
+
     init(workout: ActiveWorkout) {
         self.workout = workout
-        _session = StateObject(wrappedValue: TrainerSession(plan: workout.plan, title: workout.title))
+        let pro = UserDefaults.standard.bool(forKey: "cachedIsPro")
+        _session = StateObject(wrappedValue: TrainerSession(
+            plan: workout.plan,
+            title: workout.title,
+            coachedIDs: FreeCoaching.unlockedIDs(isPro: pro)))
     }
 
     private var isSimulator: Bool {
@@ -60,7 +66,7 @@ struct TrainerView: View {
             .allowsHitTesting(false)
 
             if session.stage == .finished {
-                WorkoutSummaryView(session: session) { close() }
+                WorkoutSummaryView(session: session, onDone: { close() }, onUnlockCoaching: { showCoachPaywall = true })
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             } else if cameraBlocked {
                 CameraBlockedView(denied: camera.authorization != .authorized, onClose: close)
@@ -77,6 +83,9 @@ struct TrainerView: View {
                 music.stop()
                 persist()
             }
+        }
+        .sheet(isPresented: $showCoachPaywall) {
+            PaywallView()
         }
         .confirmationDialog("End this workout?", isPresented: $confirmExit, titleVisibility: .visible) {
             Button("Save and finish") {
@@ -100,6 +109,16 @@ struct TrainerView: View {
             VStack(spacing: 0) {
                 topBar
                 planProgress.padding(.top, 12)
+                if !session.liveCoaching {
+                    Button {
+                        SpotterAnalytics.click("open_paywall", screen: "workout", ["source": "coaching_locked", "exercise": session.spec.id])
+                        showCoachPaywall = true
+                    } label: {
+                        Pill(text: String(localized: "Form coaching is off · Unlock"), symbol: "lock.fill", color: Theme.violet)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 8)
+                }
                 if session.spec.category == .gym, !showMusicLibrary {
                     LoadStepper(session: session)
                         .padding(.top, 8)
@@ -318,7 +337,8 @@ struct TrainerView: View {
         saved = true
         let results = session.results
         let reps = results.reduce(0) { $0 + $1.reps }
-        let average = results.reduce(0) { $0 + $1.avgScore } / max(1, results.count)
+        let scored = results.filter(\.coached)
+        let average = scored.isEmpty ? 0 : scored.reduce(0) { $0 + $1.avgScore } / scored.count
         let log = WorkoutLog(id: session.sessionID, date: .now, title: session.title,
                              durationSeconds: Int(Date().timeIntervalSince(session.startedAt)),
                              totalReps: reps, avgFormScore: average, setCount: results.count)
@@ -474,6 +494,10 @@ struct FramingCard: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
                 }
+            } else if !session.liveCoaching {
+                Text("Reps will count. Live form coaching is off for this exercise.")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.75))
             }
             HStack(spacing: 8) {
                 Circle().fill(session.inFrame ? Theme.accent : Theme.warn).frame(width: 9, height: 9)
@@ -511,14 +535,14 @@ struct RestCard: View {
                         .foregroundStyle(.white.opacity(0.7))
                 }
                 Spacer()
-                if let last = session.results.last {
+                if let last = session.results.last, last.coached {
                     VStack(spacing: 6) {
                         ScoreRing(score: last.avgScore, size: 64, lineWidth: 6)
                         Text("Set form").eyebrow(.white.opacity(0.6))
                     }
                 }
             }
-            if let fault = session.results.last?.topFault {
+            if let fault = session.results.last?.topFault, session.results.last?.coached == true {
                 HStack(spacing: 10) {
                     Image(systemName: "target").foregroundStyle(Theme.warn)
                     Text("Focus next set: \(fault)")
@@ -550,7 +574,8 @@ struct ExerciseDoneCard: View {
 
     var body: some View {
         let sets = session.currentExerciseResults
-        let average = sets.isEmpty ? 0 : sets.reduce(0) { $0 + $1.avgScore } / sets.count
+        let scored = sets.filter(\.coached)
+        let average = scored.isEmpty ? 0 : scored.reduce(0) { $0 + $1.avgScore } / scored.count
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -558,7 +583,9 @@ struct ExerciseDoneCard: View {
                     Text(session.spec.name).font(.display(26, weight: .heavy)).foregroundStyle(.white)
                 }
                 Spacer()
-                ScoreRing(score: average, size: 64, lineWidth: 6)
+                if !scored.isEmpty {
+                    ScoreRing(score: average, size: 64, lineWidth: 6)
+                }
             }
             HStack(spacing: 8) {
                 ForEach(sets) { s in
@@ -566,7 +593,7 @@ struct ExerciseDoneCard: View {
                         Text(session.isHold ? "\(s.holdSeconds)s" : "\(s.reps)")
                             .font(.display(18, weight: .bold)).foregroundStyle(.white)
                         Text("Set \(s.setNumber)").font(.caption2.weight(.semibold)).foregroundStyle(.white.opacity(0.6))
-                        Capsule().fill(Theme.scoreColor(s.avgScore)).frame(width: 24, height: 4)
+                        Capsule().fill(s.coached ? Theme.scoreColor(s.avgScore) : Color.white.opacity(0.25)).frame(width: 24, height: 4)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)

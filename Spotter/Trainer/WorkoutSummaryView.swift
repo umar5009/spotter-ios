@@ -3,10 +3,15 @@ import SwiftUI
 struct WorkoutSummaryView: View {
     @ObservedObject var session: TrainerSession
     var onDone: () -> Void
+    var onUnlockCoaching: () -> Void
 
     private var results: [SetResult] { session.results }
+    private var coachedResults: [SetResult] { results.filter(\.coached) }
     private var totalReps: Int { results.reduce(0) { $0 + $1.reps } }
-    private var average: Int { results.isEmpty ? 0 : results.reduce(0) { $0 + $1.avgScore } / results.count }
+    private var average: Int {
+        guard !coachedResults.isEmpty else { return 0 }
+        return coachedResults.reduce(0) { $0 + $1.avgScore } / coachedResults.count
+    }
     private var minutes: Int { max(1, Int(Date().timeIntervalSince(session.startedAt) / 60)) }
 
     private var topFix: (String, Int)? {
@@ -42,12 +47,29 @@ struct WorkoutSummaryView: View {
                         stat("\(results.count)", "sets")
                     }
 
-                    Card {
-                        HStack(spacing: 16) {
-                            ScoreRing(score: average, size: 84, lineWidth: 8)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Average form score").font(.display(17, weight: .bold)).foregroundStyle(.white)
-                                Text(verdict).font(.subheadline).foregroundStyle(Theme.textSecondary)
+                    if coachedResults.isEmpty {
+                        Button {
+                            SpotterAnalytics.click("open_paywall", screen: "workout_summary", ["source": "coaching_locked"])
+                            onUnlockCoaching()
+                        } label: {
+                            Card {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Label("Reps counted", systemImage: "checkmark.circle.fill")
+                                        .font(.display(17, weight: .bold)).foregroundStyle(.white)
+                                    Text("Live form coaching is free on the two exercises you picked. Unlock it for every exercise.")
+                                        .font(.subheadline).foregroundStyle(Theme.textSecondary)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        Card {
+                            HStack(spacing: 16) {
+                                ScoreRing(score: average, size: 84, lineWidth: 8)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Average form score").font(.display(17, weight: .bold)).foregroundStyle(.white)
+                                    Text(verdict).font(.subheadline).foregroundStyle(Theme.textSecondary)
+                                }
                             }
                         }
                     }
@@ -77,7 +99,10 @@ struct WorkoutSummaryView: View {
                                             .font(.subheadline.monospacedDigit()).foregroundStyle(Theme.textSecondary)
                                     }
                                     Spacer()
-                                    ScoreRing(score: sets.reduce(0) { $0 + $1.avgScore } / max(1, sets.count), size: 44, lineWidth: 4)
+                                    let scored = sets.filter(\.coached)
+                                    if !scored.isEmpty {
+                                        ScoreRing(score: scored.reduce(0) { $0 + $1.avgScore } / scored.count, size: 44, lineWidth: 4)
+                                    }
                                 }
                             }
                         }

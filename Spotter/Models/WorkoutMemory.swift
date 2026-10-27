@@ -151,15 +151,15 @@ enum TrainingFocus: String, CaseIterable, Identifiable {
 
     var detail: String {
         switch self {
-        case .chest: return String(localized: "Every chest exercise.")
-        case .back: return String(localized: "Every back exercise.")
-        case .legs: return String(localized: "Every leg exercise.")
-        case .shoulders: return String(localized: "Every shoulder exercise.")
-        case .arms: return String(localized: "Every arm exercise.")
-        case .push: return String(localized: "Every pushing exercise.")
-        case .pull: return String(localized: "Every pulling exercise.")
-        case .fullBody: return String(localized: "Every exercise.")
-        case .core: return String(localized: "Every core exercise.")
+        case .chest: return String(localized: "Bench, push-ups, and dips.")
+        case .back: return String(localized: "Rows, pull-ups, and a hinge.")
+        case .legs: return String(localized: "Squat, lunge, step-up, and hips.")
+        case .shoulders: return String(localized: "Press, then lateral and front raises.")
+        case .arms: return String(localized: "Curls, dips, and a press.")
+        case .push: return String(localized: "Bench, push-ups, press, and dips.")
+        case .pull: return String(localized: "Rows, pull-ups, and curls.")
+        case .fullBody: return String(localized: "Squat, push, row, hinge, and a plank.")
+        case .core: return String(localized: "Plank, dead bug, and bird dog.")
         case .rest: return String(localized: "Easy core and glutes. Move, then stop.")
         }
     }
@@ -168,25 +168,25 @@ enum TrainingFocus: String, CaseIterable, Identifiable {
         _ = place
         switch self {
         case .chest:
-            return ["bench", "pushUp", "overheadPress"]
+            return ["bench", "pushUp", "dip", "kneePushUp"]
         case .back:
-            return ["row", "rdl", "gluteBridge"]
+            return ["row", "pullUp", "invertedRow", "rdl"]
         case .legs:
-            return ["squat", "lunge", "gluteBridge", "rdl", "hipThrust"]
+            return ["squat", "lunge", "stepUp", "rdl", "hipThrust"]
         case .shoulders:
-            return ["overheadPress", "lateralRaise", "bench", "pushUp"]
+            return ["overheadPress", "lateralRaise", "frontRaise", "pushUp"]
         case .arms:
-            return ["bicepCurl", "bench", "pushUp", "overheadPress"]
+            return ["bicepCurl", "dip", "frontRaise", "overheadPress"]
         case .push:
-            return ["bench", "pushUp", "overheadPress", "lateralRaise"]
+            return ["bench", "pushUp", "overheadPress", "dip"]
         case .pull:
-            return ["row", "rdl", "bicepCurl", "gluteBridge"]
+            return ["row", "pullUp", "invertedRow", "bicepCurl"]
         case .fullBody:
-            return ExerciseLibrary.all.map(\.id)
+            return ["squat", "pushUp", "row", "rdl", "plank"]
         case .core:
-            return ["plank", "gluteBridge", "pushUp"]
+            return ["plank", "deadBug", "birdDog", "gluteBridge"]
         case .rest:
-            return ["plank", "gluteBridge"]
+            return ["plank", "deadBug", "gluteBridge"]
         }
     }
 }

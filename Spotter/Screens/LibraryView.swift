@@ -2,45 +2,70 @@ import SwiftUI
 
 struct LibraryView: View {
     @EnvironmentObject private var store: StoreManager
-    @State private var filter: Filter = .all
+    @EnvironmentObject private var router: AppRouter
+    @AppStorage("freeCoachingIDs") private var freeCoachingRaw = ""
+    @AppStorage("level") private var levelRaw = Level.beginner.rawValue
+    @State private var browse: Browse = .all
     @State private var showWeekPlan = false
 
-    enum Filter: String, CaseIterable, Identifiable {
-        case all = "All", home = "Home", gym = "Gym"
-        var id: String { rawValue }
+    enum Browse: Hashable {
+        case all, free
+        case program(ExerciseProgram)
+
         var title: String {
             switch self {
             case .all: return String(localized: "All")
-            case .home: return String(localized: "Home")
-            case .gym: return String(localized: "Gym")
+            case .free: return String(localized: "Free")
+            case .program(let program): return program.title
             }
         }
     }
 
+    private var chips: [Browse] {
+        [.all, .free] + ExerciseProgram.allCases.map { .program($0) }
+    }
+
     private var items: [ExerciseSpec] {
-        switch filter {
+        switch browse {
         case .all: return ExerciseLibrary.all
-        case .home: return ExerciseLibrary.all.filter { $0.category == .home }
-        case .gym: return ExerciseLibrary.all.filter { $0.category == .gym }
+        case .free: return ExerciseLibrary.free
+        case .program(let program): return ExerciseLibrary.listed(in: program)
         }
     }
+
+    private var level: Level { Level(rawValue: levelRaw) ?? .beginner }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     weekCard
-                    Picker("Filter", selection: $filter) {
-                        ForEach(Filter.allCases) { Text($0.title).tag($0) }
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(chips, id: \.title) { chip in
+                                let selected = browse == chip
+                                Button {
+                                    SpotterAnalytics.click("exercise_filter", screen: "exercises", ["filter": chip.title])
+                                    browse = chip
+                                } label: {
+                                    Text(chip.title)
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundStyle(selected ? Color.black : Color.white)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 8)
+                                        .background(selected ? Theme.accent : Color.white.opacity(0.06), in: Capsule())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
                     }
-                    .pickerStyle(.segmented)
-                    .onChange(of: filter) { _, new in
-                        SpotterAnalytics.click("exercise_filter", screen: "exercises", ["filter": new.rawValue])
+                    if case .program(let program) = browse {
+                        programBanner(program)
                     }
 
                     ForEach(items) { spec in
                         NavigationLink(value: spec.id) {
-                            ExerciseRow(spec: spec, locked: !spec.isFree && !store.isPro)
+                            ExerciseRow(spec: spec, locked: !spec.isFree && !store.isPro, freeCoach: !store.isPro && freeCoachingRaw.split(separator: ",").contains(Substring(spec.id)))
                         }
                         .buttonStyle(.plain)
                         .trackClick("exercise_open", screen: "exercises", ["exercise": spec.id])
@@ -55,6 +80,9 @@ struct LibraryView: View {
             .toolbarTitleDisplayMode(.inline)
             .navigationDestination(for: String.self) { id in
                 ExerciseDetailView(exerciseID: id)
+            }
+            .navigationDestination(for: ExerciseProgram.self) { program in
+                ProgramDetailView(program: program)
             }
             .sheet(isPresented: $showWeekPlan) {
                 WeekPlanView()
@@ -86,11 +114,37 @@ struct LibraryView: View {
         }
         .buttonStyle(.plain)
     }
+
+    private func programBanner(_ program: ExerciseProgram) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(program.subtitle)
+                .font(.subheadline)
+                .foregroundStyle(Theme.textSecondary)
+            Button {
+                if store.isPro {
+                    let plan = ProgramSession.plan(for: program, level: level)
+                    guard !plan.isEmpty else { return }
+                    SpotterAnalytics.click("start_workout", screen: "exercises", ["program": program.rawValue])
+                    router.start(ActiveWorkout(title: program.title, plan: plan))
+                } else {
+                    SpotterAnalytics.click("open_paywall", screen: "exercises", ["source": "program", "program": program.rawValue])
+                    router.showPaywall = true
+                }
+            } label: {
+                Label(store.isPro ? "Start program" : "Unlock with Spotter Pro", systemImage: store.isPro ? "play.fill" : "lock.open.fill")
+            }
+            .buttonStyle(PrimaryButtonStyle(color: store.isPro ? Theme.accent : Theme.violet))
+        }
+        .padding(16)
+        .background(Theme.violet.opacity(0.12), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Theme.violet.opacity(0.35)))
+    }
 }
 
 struct ExerciseRow: View {
     let spec: ExerciseSpec
     let locked: Bool
+    var freeCoach: Bool = false
 
     var body: some View {
         HStack(spacing: 14) {
@@ -106,8 +160,14 @@ struct ExerciseRow: View {
                 }
                 Text(spec.muscles.joined(separator: " · ")).font(.subheadline).foregroundStyle(Theme.textSecondary).lineLimit(1)
                 HStack(spacing: 6) {
-                    Pill(text: spec.category.title, symbol: spec.category == .gym ? "dumbbell.fill" : "house.fill")
-                    Pill(text: spec.camera.label, symbol: "camera.fill")
+                    if let program = spec.programs.first {
+                        Pill(text: program.title, symbol: program.symbol, color: Theme.violet)
+                    } else {
+                        Pill(text: spec.category.title, symbol: spec.category == .gym ? "dumbbell.fill" : "house.fill")
+                    }
+                    if freeCoach {
+                        Pill(text: String(localized: "Free coach"), symbol: "waveform", color: Theme.accent)
+                    }
                 }
             }
             Spacer()
@@ -130,10 +190,21 @@ struct ExerciseDetailView: View {
     @State private var weight: Double = 0
     @State private var rest = 60
     @State private var configured = false
+    @AppStorage("freeCoachingIDs") private var freeCoachingRaw = ""
 
     private var spec: ExerciseSpec { ExerciseLibrary.spec(exerciseID) }
     private var weightUnit: Measure.Weight { Measure.Weight(rawValue: weightUnitRaw) ?? .kilograms }
     private var locked: Bool { !spec.isFree && !store.isPro }
+    private var coachingOn: Bool {
+        _ = freeCoachingRaw
+        return store.isPro || FreeCoaching.includes(spec.id)
+    }
+
+    private var startTitle: String {
+        if locked { return String(localized: "Unlock with Spotter Pro") }
+        if coachingOn { return String(localized: "Start with AI coach") }
+        return String(localized: "Start workout")
+    }
 
     var body: some View {
         ScrollView {
@@ -166,6 +237,16 @@ struct ExerciseDetailView: View {
                                     .background(Theme.accent, in: Circle())
                                 Text(step).foregroundStyle(.white).fixedSize(horizontal: false, vertical: true)
                             }
+                        }
+                    }
+                }
+                if !locked && !coachingOn {
+                    Card {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Reps are free", systemImage: "checkmark.circle.fill")
+                                .font(.display(16, weight: .bold)).foregroundStyle(.white)
+                            Text("Live form coaching is free on the two exercises you picked. This one counts your reps without corrections.")
+                                .font(.subheadline).foregroundStyle(Theme.textSecondary)
                         }
                     }
                 }
@@ -208,21 +289,31 @@ struct ExerciseDetailView: View {
         .navigationTitle(spec.name)
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
-            Button {
-                if locked {
-                    SpotterAnalytics.click("open_paywall", screen: "exercise", ["source": "locked_start", "exercise": spec.id])
-                    router.showPaywall = true
-                } else {
-                    SpotterAnalytics.click("start_workout", screen: "exercise", ["exercise": spec.id])
-                    let item = PlannedExercise(exerciseID: spec.id, sets: sets, target: target, restSeconds: rest,
-                                               weightKg: spec.category == .gym ? weight : nil)
-                    router.start(ActiveWorkout(title: spec.name, plan: [item]))
+            VStack(spacing: 8) {
+                if !locked && !coachingOn {
+                    Button {
+                        SpotterAnalytics.click("open_paywall", screen: "exercise", ["source": "coaching_locked", "exercise": spec.id])
+                        router.showPaywall = true
+                    } label: {
+                        Text("Unlock live coaching")
+                    }
+                    .buttonStyle(GlassButtonStyle())
                 }
-            } label: {
-                Label(locked ? "Unlock with Spotter Pro" : "Start with AI coach",
-                      systemImage: locked ? "lock.open.fill" : "camera.viewfinder")
+                Button {
+                    if locked {
+                        SpotterAnalytics.click("open_paywall", screen: "exercise", ["source": "locked_start", "exercise": spec.id])
+                        router.showPaywall = true
+                    } else {
+                        SpotterAnalytics.click("start_workout", screen: "exercise", ["exercise": spec.id, "coaching": coachingOn ? "true" : "false"])
+                        let item = PlannedExercise(exerciseID: spec.id, sets: sets, target: target, restSeconds: rest,
+                                                   weightKg: spec.category == .gym ? weight : nil)
+                        router.start(ActiveWorkout(title: spec.name, plan: [item]))
+                    }
+                } label: {
+                    Label(startTitle, systemImage: locked ? "lock.open.fill" : "camera.viewfinder")
+                }
+                .buttonStyle(PrimaryButtonStyle(color: locked ? Theme.violet : Theme.accent))
             }
-            .buttonStyle(PrimaryButtonStyle(color: locked ? Theme.violet : Theme.accent))
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(Theme.bg.opacity(0.95))
@@ -258,6 +349,12 @@ struct ExerciseDetailView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     ForEach(spec.muscles, id: \.self) { Pill(text: $0, color: .white) }
+                    ForEach(spec.programs) { program in
+                        Pill(text: program.title, symbol: program.symbol, color: Theme.violet)
+                    }
+                    if coachingOn && !store.isPro {
+                        Pill(text: String(localized: "Free coach"), symbol: "waveform", color: Theme.accent)
+                    }
                 }
             }
         }
@@ -294,5 +391,71 @@ struct ExerciseDetailView: View {
             .buttonStyle(.plain)
         }
         .padding(.vertical, 6)
+    }
+}
+
+struct ProgramDetailView: View {
+    let program: ExerciseProgram
+    @EnvironmentObject private var store: StoreManager
+    @EnvironmentObject private var router: AppRouter
+    @AppStorage("level") private var levelRaw = Level.beginner.rawValue
+
+    private var level: Level { Level(rawValue: levelRaw) ?? .beginner }
+    private var session: [ExerciseSpec] { ProgramSession.exercises(for: program) }
+    private var library: [ExerciseSpec] { ExerciseLibrary.listed(in: program) }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(program.title).font(.display(32, weight: .heavy)).foregroundStyle(.white)
+                    Text(program.subtitle).foregroundStyle(Theme.textSecondary)
+                    if !store.isPro {
+                        Text("This program is part of Spotter Pro.")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.violet)
+                    }
+                }
+                .padding(.top, 8)
+
+                Button {
+                    if store.isPro {
+                        let plan = ProgramSession.plan(for: program, level: level)
+                        guard !plan.isEmpty else { return }
+                        SpotterAnalytics.click("start_workout", screen: "program", ["program": program.rawValue])
+                        router.start(ActiveWorkout(title: program.title, plan: plan))
+                    } else {
+                        SpotterAnalytics.click("open_paywall", screen: "program", ["source": "program", "program": program.rawValue])
+                        router.showPaywall = true
+                    }
+                } label: {
+                    Label(store.isPro ? "Start program" : "Unlock with Spotter Pro", systemImage: store.isPro ? "play.fill" : "lock.open.fill")
+                }
+                .buttonStyle(PrimaryButtonStyle(color: store.isPro ? Theme.accent : Theme.violet))
+
+                Text("Today's session").eyebrow()
+                ForEach(session) { spec in
+                    NavigationLink(value: spec.id) {
+                        ExerciseRow(spec: spec, locked: !store.isPro)
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                if library.count > session.count {
+                    Text("Full program").eyebrow()
+                    ForEach(library.dropFirst(session.count)) { spec in
+                        NavigationLink(value: spec.id) {
+                            ExerciseRow(spec: spec, locked: !store.isPro)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
+        }
+        .background(Theme.bg.ignoresSafeArea())
+        .navigationTitle(program.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -700,6 +700,9 @@
         }
       }
     },
+    "%@ complete." : {
+
+    },
     "%@ complete. Average form %lld." : {
       "localizations" : {
         "ar" : {
@@ -1816,6 +1819,12 @@
         }
       }
     },
+    "6-Pack" : {
+
+    },
+    "6-Pack, weight loss, and live coaching on every exercise" : {
+
+    },
     "7 days free, then %@/year. Cancel anytime in Settings." : {
       "localizations" : {
         "ar" : {
@@ -2588,10 +2597,14 @@
     "A reminder each day names that day's exercises. Turn them off here, or in iOS Settings." : {
 
     },
+    "A row, a lunge, and an easy core hold." : {
+
+    },
     "A row, then raises, curls and a press." : {
 
     },
     "A second full-body day so Monday isn't the only hard one." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3961,7 +3974,16 @@
     "Bench Press" : {
 
     },
-    "Bench, then shoulders." : {
+    "Bench, a dip, then shoulders." : {
+
+    },
+    "Bench, push-ups, and dips." : {
+
+    },
+    "Bench, push-ups, press, and dips." : {
+
+    },
+    "Bend your elbows and pull toward your face" : {
 
     },
     "Bent-over Row" : {
@@ -5359,6 +5381,9 @@
         }
       }
     },
+    "Build Muscle" : {
+
+    },
     "By exercise" : {
       "localizations" : {
         "ar" : {
@@ -5714,6 +5739,12 @@
       }
     },
     "Chest day" : {
+
+    },
+    "Chest stays toward the floor" : {
+
+    },
+    "Choose 2 exercises" : {
 
     },
     "Choose kilograms or pounds, and centimetres or feet and inches. BMI uses the same numbers either way. Healthy for most adults is 18.5–24.9." : {
@@ -6433,6 +6464,9 @@
         }
       }
     },
+    "Crunches, leg raises, and holds for the midsection." : {
+
+    },
     "Curl all the way up." : {
       "localizations" : {
         "ar" : {
@@ -6490,6 +6524,12 @@
           }
         }
       }
+    },
+    "Curl the ribs, not the neck" : {
+
+    },
+    "Curls, dips, and a press." : {
+
     },
     "Daily" : {
 
@@ -6669,6 +6709,9 @@
       }
     },
     "days" : {
+
+    },
+    "Deadlift, front squat, push press, and a strict row." : {
 
     },
     "Delts" : {
@@ -7821,30 +7864,6 @@
     "Enter how much to lose, or leave it blank." : {
 
     },
-    "Every arm exercise." : {
-
-    },
-    "Every back exercise." : {
-
-    },
-    "Every chest exercise." : {
-
-    },
-    "Every core exercise." : {
-
-    },
-    "Every exercise." : {
-
-    },
-    "Every leg exercise." : {
-
-    },
-    "Every pulling exercise." : {
-
-    },
-    "Every pushing exercise." : {
-
-    },
     "Every session adapts: hit your reps with a form score above 85 and Spotter will suggest progressing." : {
       "localizations" : {
         "ar" : {
@@ -7902,9 +7921,6 @@
           }
         }
       }
-    },
-    "Every shoulder exercise." : {
-
     },
     "Everything runs on your iPhone. No video is recorded or uploaded." : {
       "localizations" : {
@@ -8079,6 +8095,9 @@
           }
         }
       }
+    },
+    "Extra variations for size, at home or with weights." : {
+
     },
     "Face the camera. Prop your phone at chest height, about 2 to 3 metres away." : {
       "localizations" : {
@@ -8377,6 +8396,7 @@
       }
     },
     "Filter" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8503,6 +8523,9 @@
           }
         }
       }
+    },
+    "Finish the full range so it counts." : {
+
     },
     "Finish the session. The scale follows the weeks you don't skip." : {
       "localizations" : {
@@ -9087,6 +9110,9 @@
     "Form Champ" : {
 
     },
+    "Form coaching is off · Unlock" : {
+
+    },
     "Form score · last 7 days" : {
       "localizations" : {
         "ar" : {
@@ -9202,6 +9228,15 @@
           }
         }
       }
+    },
+    "Free" : {
+
+    },
+    "Free coach" : {
+
+    },
+    "Free exercises" : {
+
     },
     "Free gym songs in %@." : {
 
@@ -9449,6 +9484,9 @@
           }
         }
       }
+    },
+    "Full program" : {
+
     },
     "Future you only gets the workouts you actually do." : {
       "localizations" : {
@@ -9739,6 +9777,9 @@
           }
         }
       }
+    },
+    "Get Strong" : {
+
     },
     "Get stronger" : {
       "localizations" : {
@@ -10687,9 +10728,6 @@
         }
       }
     },
-    "Gym mode, tempo coaching and all %lld exercises" : {
-
-    },
     "Gym mode, tempo coaching and all 9 exercises" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11225,6 +11263,9 @@
         }
       }
     },
+    "Hinge over and pin your upper arm" : {
+
+    },
     "Hinge until your chest faces the floor, knees softly bent." : {
 
     },
@@ -11404,6 +11445,9 @@
           }
         }
       }
+    },
+    "Holds that open the hips, hamstrings, and upper back." : {
+
     },
     "Home" : {
       "localizations" : {
@@ -11872,6 +11916,9 @@
         }
       }
     },
+    "Included" : {
+
+    },
     "Intermediate" : {
       "localizations" : {
         "ar" : {
@@ -12051,6 +12098,12 @@
           }
         }
       }
+    },
+    "Keep the bar close to your legs" : {
+
+    },
+    "Keep the legs straight" : {
+
     },
     "Keep the reps honest. Sloppy volume doesn't move the trend." : {
       "localizations" : {
@@ -12284,6 +12337,9 @@
         }
       }
     },
+    "Keep your elbows close to your ribs" : {
+
+    },
     "Keep your front knee over your foot." : {
       "localizations" : {
         "ar" : {
@@ -12399,6 +12455,9 @@
           }
         }
       }
+    },
+    "Kickbacks, frog pumps, and single-leg bridges." : {
+
     },
     "Kilograms" : {
       "localizations" : {
@@ -13056,6 +13115,9 @@
         }
       }
     },
+    "Lift your chest and thighs a little higher" : {
+
+    },
     "Listed pass price in USD. Reserving saves it on this iPhone. Spotter does not charge the gym." : {
 
     },
@@ -13116,6 +13178,21 @@
           }
         }
       }
+    },
+    "Live coaching is free on %@. 6-Pack, weight loss, and the other programs are part of Spotter Pro." : {
+
+    },
+    "Live form coaching is free on %@. Other exercises count reps without corrections until you upgrade. Voice still calls your rep count." : {
+
+    },
+    "Live form coaching is free on the two exercises you picked. This one counts your reps without corrections." : {
+
+    },
+    "Live form coaching is free on the two exercises you picked. Unlock it for every exercise." : {
+
+    },
+    "Live form coaching stays free on these two. Every other exercise still counts your reps. Goal programs are part of Spotter Pro." : {
+
     },
     "Load" : {
 
@@ -14302,6 +14379,7 @@
       }
     },
     "Lunges and squats for the legs." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14358,6 +14436,9 @@
           }
         }
       }
+    },
+    "Lunges, a step-up, and a bridge." : {
+
     },
     "Make a U-turn" : {
 
@@ -14596,6 +14677,9 @@
           }
         }
       }
+    },
+    "Mobility" : {
+
     },
     "Monthly" : {
       "localizations" : {
@@ -16514,6 +16598,12 @@
         }
       }
     },
+    "Pick 2 exercises for free coaching" : {
+
+    },
+    "Pike your hips higher" : {
+
+    },
     "Pin your elbows to your sides" : {
       "localizations" : {
         "ar" : {
@@ -16629,6 +16719,12 @@
           }
         }
       }
+    },
+    "Plank, dead bug, and bird dog." : {
+
+    },
+    "Point your elbows straight back" : {
+
     },
     "Points are your reps and holds, weighted by form score." : {
       "localizations" : {
@@ -17039,6 +17135,12 @@
     "Press up until your arms lock out. Keep your hips on the bench." : {
 
     },
+    "Press your lower back into the floor" : {
+
+    },
+    "Press, then lateral and front raises." : {
+
+    },
     "Pressing strength, then shoulders." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -17272,6 +17374,9 @@
         }
       }
     },
+    "Pro" : {
+
+    },
     "Profile" : {
       "localizations" : {
         "ar" : {
@@ -17329,6 +17434,9 @@
           }
         }
       }
+    },
+    "Programs" : {
+
     },
     "Progress" : {
       "localizations" : {
@@ -17986,6 +18094,9 @@
         }
       }
     },
+    "Push your knees out over your toes" : {
+
+    },
     "Push-up" : {
       "localizations" : {
         "ar" : {
@@ -18161,6 +18272,7 @@
       }
     },
     "Quick start" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18275,6 +18387,9 @@
           }
         }
       }
+    },
+    "Raise both arms together" : {
+
     },
     "Raise out to the sides until your arms reach shoulder height." : {
       "localizations" : {
@@ -18693,6 +18808,9 @@
     "Remove" : {
 
     },
+    "Rep %lld" : {
+
+    },
     "reps" : {
       "localizations" : {
         "ar" : {
@@ -18808,6 +18926,15 @@
           }
         }
       }
+    },
+    "Reps are free" : {
+
+    },
+    "Reps counted" : {
+
+    },
+    "Reps will count. Live form coaching is off for this exercise." : {
+
     },
     "Reserve" : {
 
@@ -19225,10 +19352,16 @@
         }
       }
     },
-    "Romanian deadlifts, hip thrusts and lunges." : {
+    "Romanian deadlifts, good mornings, hip thrusts and lunges." : {
 
     },
     "Route" : {
+
+    },
+    "Rows, pull-ups, and a hinge." : {
+
+    },
+    "Rows, pull-ups, and curls." : {
 
     },
     "s hold" : {
@@ -19707,6 +19840,9 @@
         }
       }
     },
+    "Set %lld done. Rest up." : {
+
+    },
     "Set %lld of %lld · %lld%@" : {
       "localizations" : {
         "ar" : {
@@ -20042,6 +20178,9 @@
       }
     },
     "sharp sessions" : {
+
+    },
+    "Short circuits that keep you moving." : {
 
     },
     "Short sessions you'll actually do" : {
@@ -20874,6 +21013,9 @@
           }
         }
       }
+    },
+    "Soften the knees. This is a hinge, not a squat" : {
+
     },
     "Soften your knees, then push your hips straight back." : {
       "localizations" : {
@@ -21879,6 +22021,7 @@
       }
     },
     "Squat pattern again, then glutes." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21936,10 +22079,16 @@
         }
       }
     },
+    "Squat pattern, a side lunge, then glutes." : {
+
+    },
     "Squat, bench and a row." : {
 
     },
     "Squat, hinge, then hips." : {
+
+    },
+    "Squat, lunge, step-up, and hips." : {
 
     },
     "Squat, push, and a short core finisher." : {
@@ -21999,6 +22148,9 @@
           }
         }
       }
+    },
+    "Squat, push, row, hinge, and a plank." : {
+
     },
     "Squeeze at the top without moving your elbows forward." : {
       "localizations" : {
@@ -22757,6 +22909,9 @@
         }
       }
     },
+    "Start program" : {
+
+    },
     "Start the session before you negotiate with yourself." : {
       "localizations" : {
         "ar" : {
@@ -22930,6 +23085,12 @@
           }
         }
       }
+    },
+    "Start workout" : {
+
+    },
+    "Stay hinged. Chest toward the floor" : {
+
     },
     "Stay hinged. Keep your chest down" : {
 
@@ -23284,6 +23445,9 @@
           }
         }
       }
+    },
+    "Straighten the legs as far as you can" : {
+
     },
     "streak · best %lld" : {
       "localizations" : {
@@ -24221,6 +24385,9 @@
           }
         }
       }
+    },
+    "This program is part of Spotter Pro." : {
+
     },
     "This song couldn't play. Try the next one." : {
 
@@ -25473,6 +25640,9 @@
         }
       }
     },
+    "Unlock live coaching" : {
+
+    },
     "Unlock with Spotter Pro" : {
       "localizations" : {
         "ar" : {
@@ -26200,6 +26370,9 @@
       }
     },
     "Weight loss" : {
+
+    },
+    "Weight Loss" : {
 
     },
     "Weight loss progress" : {

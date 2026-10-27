@@ -9,6 +9,7 @@ struct HomeView: View {
     @AppStorage("level") private var levelRaw = Level.beginner.rawValue
     @AppStorage("goal") private var goalRaw = Goal.strength.rawValue
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
+    @AppStorage("freeCoachingIDs") private var freeCoachingRaw = ""
     @Query(sort: \WorkoutLog.date, order: .reverse) private var logs: [WorkoutLog]
     @ObservedObject private var weekSplit = WeekSplitStore.shared
     @State private var selectedDay = Calendar.current.startOfDay(for: .now)
@@ -64,6 +65,7 @@ struct HomeView: View {
                     quoteCard
                     todayCard
                     if !store.isPro { upgradeCard }
+                    programsRow
                     weekCard
                     quickStart
                 }
@@ -76,6 +78,9 @@ struct HomeView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: String.self) { id in
                 ExerciseDetailView(exerciseID: id)
+            }
+            .navigationDestination(for: ExerciseProgram.self) { program in
+                ProgramDetailView(program: program)
             }
             .sheet(isPresented: $showWeekPlan) {
                 WeekPlanView { day in
@@ -278,7 +283,7 @@ struct HomeView: View {
                 SpotterAnalytics.click("start_workout", screen: "today", ["title": plan.title])
                 router.start(ActiveWorkout(title: plan.title, plan: items))
             } label: {
-                Label(isToday ? String(localized: "Start with AI coach") : String(localized: "Train this day"), systemImage: "camera.viewfinder")
+                Label(startLabel, systemImage: "camera.viewfinder")
             }
             .buttonStyle(PrimaryButtonStyle())
         }
@@ -291,6 +296,14 @@ struct HomeView: View {
             .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
         }
         .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).stroke(Theme.stroke))
+    }
+
+    private var startLabel: String {
+        _ = freeCoachingRaw
+        if !Calendar.current.isDateInToday(activeDay) { return String(localized: "Train this day") }
+        if store.isPro { return String(localized: "Start with AI coach") }
+        let coached = !trainableItems.isEmpty && trainableItems.allSatisfy { FreeCoaching.includes($0.exerciseID) }
+        return coached ? String(localized: "Start with AI coach") : String(localized: "Start workout")
     }
 
     private var sessionHeadline: String {
@@ -350,7 +363,7 @@ struct HomeView: View {
                     .background(Theme.violet, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Unlock your full plan").font(.display(16, weight: .bold)).foregroundStyle(.white)
-                    Text("Gym mode, tempo coaching and all \(ExerciseLibrary.all.count) exercises").font(.subheadline).foregroundStyle(Theme.textSecondary)
+                    Text("6-Pack, weight loss, and live coaching on every exercise").font(.subheadline).foregroundStyle(Theme.textSecondary)
                 }
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(Theme.textTertiary)
@@ -429,12 +442,42 @@ struct HomeView: View {
         }
     }
 
-    private var quickStart: some View {
+    private var programsRow: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Quick start").eyebrow()
+            Text("Programs").eyebrow()
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ForEach(ExerciseLibrary.all) { spec in
+                    ForEach(ExerciseProgram.allCases) { program in
+                        NavigationLink(value: program) {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Image(systemName: program.symbol)
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundStyle(store.isPro ? Theme.accent : Theme.violet)
+                                Spacer()
+                                Text(program.title).font(.display(15, weight: .bold)).foregroundStyle(.white).lineLimit(2)
+                                Text(store.isPro ? String(localized: "Included") : String(localized: "Pro"))
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(Theme.textTertiary)
+                            }
+                            .padding(14)
+                            .frame(width: 132, height: 132)
+                            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Theme.stroke))
+                        }
+                        .buttonStyle(.plain)
+                        .trackClick("open_program", screen: "today", ["program": program.rawValue])
+                    }
+                }
+            }
+        }
+    }
+
+    private var quickStart: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Free exercises").eyebrow()
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(ExerciseLibrary.free) { spec in
                         NavigationLink(value: spec.id) {
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
@@ -442,8 +485,8 @@ struct HomeView: View {
                                         .font(.system(size: 20, weight: .semibold))
                                         .foregroundStyle(Theme.accent)
                                     Spacer()
-                                    if !spec.isFree && !store.isPro {
-                                        Image(systemName: "lock.fill").font(.caption).foregroundStyle(Theme.textTertiary)
+                                    if !store.isPro && freeCoachingRaw.split(separator: ",").contains(Substring(spec.id)) {
+                                        Image(systemName: "waveform").font(.caption.weight(.bold)).foregroundStyle(Theme.accent)
                                     }
                                 }
                                 Spacer()

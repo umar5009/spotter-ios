@@ -171,20 +171,20 @@ enum PlanBuilder {
 
     private static let homeDays: [DayTemplate] = [
         DayTemplate(title: String(localized: "Full Body Strength"), blurb: String(localized: "Squat, push, and a short core finisher."), ids: ["squat", "pushUp", "gluteBridge", "plank"]),
-        DayTemplate(title: String(localized: "Lower Body"), blurb: String(localized: "Lunges and squats for the legs."), ids: ["lunge", "squat", "gluteBridge"]),
-        DayTemplate(title: String(localized: "Push & Core"), blurb: String(localized: "Push-ups with a brace for your midline."), ids: ["pushUp", "plank", "squat"]),
-        DayTemplate(title: String(localized: "Full Body B"), blurb: String(localized: "A second full-body day so Monday isn't the only hard one."), ids: ["lunge", "pushUp", "plank", "gluteBridge"]),
-        DayTemplate(title: String(localized: "Legs & Glutes"), blurb: String(localized: "Squat pattern again, then glutes."), ids: ["squat", "lunge", "gluteBridge", "plank"]),
-        DayTemplate(title: String(localized: "Conditioning"), blurb: String(localized: "Shorter rest. Keep the reps clean."), ids: ["pushUp", "squat", "lunge", "plank"]),
-        DayTemplate(title: String(localized: "Recovery"), blurb: String(localized: "Easy core and glutes. Keep the streak without grinding."), ids: ["plank", "gluteBridge"])
+        DayTemplate(title: String(localized: "Lower Body"), blurb: String(localized: "Lunges, a step-up, and a bridge."), ids: ["forwardLunge", "squat", "stepUp", "gluteBridge"]),
+        DayTemplate(title: String(localized: "Push & Core"), blurb: String(localized: "Push-ups with a brace for your midline."), ids: ["pushUp", "deadBug", "plank", "kneePushUp"]),
+        DayTemplate(title: String(localized: "Full Body B"), blurb: String(localized: "A row, a lunge, and an easy core hold."), ids: ["lunge", "invertedRow", "birdDog", "gluteBridge"]),
+        DayTemplate(title: String(localized: "Legs & Glutes"), blurb: String(localized: "Squat pattern, a side lunge, then glutes."), ids: ["squat", "sideLunge", "gluteBridge", "plank"]),
+        DayTemplate(title: String(localized: "Conditioning"), blurb: String(localized: "Shorter rest. Keep the reps clean."), ids: ["invertedRow", "pushUp", "squat", "plank"]),
+        DayTemplate(title: String(localized: "Recovery"), blurb: String(localized: "Easy core and glutes. Keep the streak without grinding."), ids: ["plank", "gluteBridge", "superman"])
     ]
 
     private static let gymDays: [DayTemplate] = [
         DayTemplate(title: String(localized: "Squat & Press"), blurb: String(localized: "A heavy lower pattern and an overhead press."), ids: ["squat", "overheadPress", "plank"]),
-        DayTemplate(title: String(localized: "Hinge"), blurb: String(localized: "Romanian deadlifts, hip thrusts and lunges."), ids: ["rdl", "hipThrust", "lunge"]),
-        DayTemplate(title: String(localized: "Push"), blurb: String(localized: "Bench, then shoulders."), ids: ["bench", "overheadPress", "lateralRaise"]),
+        DayTemplate(title: String(localized: "Hinge"), blurb: String(localized: "Romanian deadlifts, good mornings, hip thrusts and lunges."), ids: ["rdl", "goodMorning", "hipThrust", "lunge"]),
+        DayTemplate(title: String(localized: "Push"), blurb: String(localized: "Bench, a dip, then shoulders."), ids: ["bench", "dip", "overheadPress", "lateralRaise"]),
         DayTemplate(title: String(localized: "Lower Strength"), blurb: String(localized: "Squat, hinge, then hips."), ids: ["squat", "rdl", "hipThrust"]),
-        DayTemplate(title: String(localized: "Shoulders & Arms"), blurb: String(localized: "A row, then raises, curls and a press."), ids: ["row", "lateralRaise", "bicepCurl", "overheadPress"]),
+        DayTemplate(title: String(localized: "Shoulders & Arms"), blurb: String(localized: "A row, then raises, curls and a press."), ids: ["row", "lateralRaise", "frontRaise", "bicepCurl", "overheadPress"]),
         DayTemplate(title: String(localized: "Gym Full Body"), blurb: String(localized: "Squat, bench and a row."), ids: ["squat", "bench", "row", "plank"]),
         DayTemplate(title: String(localized: "Core"), blurb: String(localized: "A short day. Show up, then rest."), ids: ["plank", "gluteBridge", "pushUp"])
     ]
@@ -221,5 +221,16 @@ enum PlanBuilder {
         let target = spec.kind.isHold ? level.holdSeconds : (isGymLift ? max(6, level.reps - 2) : level.reps)
         return PlannedExercise(exerciseID: id, sets: level.sets, target: target, restSeconds: rest,
                                weightKg: isGymLift ? 0 : nil)
+    }
+}
+
+enum ProgramSession {
+    static func exercises(for program: ExerciseProgram, limit: Int = 6) -> [ExerciseSpec] {
+        Array(ExerciseLibrary.listed(in: program).prefix(limit))
+    }
+
+    static func plan(for program: ExerciseProgram, level: Level) -> [PlannedExercise] {
+        let rest = program == .weightLoss ? 30 : (program == .mobility ? 20 : 60)
+        return exercises(for: program).map { PlanBuilder.make($0.id, level: level, rest: rest) }
     }
 }

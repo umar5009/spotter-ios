@@ -12,6 +12,93 @@ enum ExerciseCategory: String {
     }
 }
 
+/// Goal programs. An exercise in any of these is part of Spotter Pro.
+/// Exercises with no program are free to train.
+enum ExerciseProgram: String, CaseIterable, Identifiable, Hashable {
+    case sixPack
+    case weightLoss
+    case buildMuscle
+    case getStrong
+    case glutes
+    case mobility
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .sixPack: return String(localized: "6-Pack")
+        case .weightLoss: return String(localized: "Weight Loss")
+        case .buildMuscle: return String(localized: "Build Muscle")
+        case .getStrong: return String(localized: "Get Strong")
+        case .glutes: return String(localized: "Glutes")
+        case .mobility: return String(localized: "Mobility")
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .sixPack: return String(localized: "Crunches, leg raises, and holds for the midsection.")
+        case .weightLoss: return String(localized: "Short circuits that keep you moving.")
+        case .buildMuscle: return String(localized: "Extra variations for size, at home or with weights.")
+        case .getStrong: return String(localized: "Deadlift, front squat, push press, and a strict row.")
+        case .glutes: return String(localized: "Kickbacks, frog pumps, and single-leg bridges.")
+        case .mobility: return String(localized: "Holds that open the hips, hamstrings, and upper back.")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .sixPack: return "figure.core.training"
+        case .weightLoss: return "flame.fill"
+        case .buildMuscle: return "dumbbell.fill"
+        case .getStrong: return "bolt.fill"
+        case .glutes: return "figure.strengthtraining.functional"
+        case .mobility: return "figure.flexibility"
+        }
+    }
+}
+
+/// The two exercises chosen on first launch. Live form coaching is free only on these.
+enum FreeCoaching {
+    static let storageKey = "freeCoachingIDs"
+    static let limit = 2
+
+    static var orderedIDs: [String] {
+        let raw = UserDefaults.standard.string(forKey: storageKey) ?? ""
+        var unique: [String] = []
+        for id in raw.split(separator: ",").map(String.init) where ExerciseLibrary.freeIDs.contains(id) && !unique.contains(id) {
+            unique.append(id)
+            if unique.count == limit { break }
+        }
+        return unique
+    }
+
+    static var ids: Set<String> { Set(orderedIDs) }
+    static var isChosen: Bool { orderedIDs.count == limit }
+    static func includes(_ id: String) -> Bool { ids.contains(id) }
+
+    static var displayNames: String {
+        let names = orderedIDs.compactMap { id in ExerciseLibrary.all.first { $0.id == id }?.name }
+        if names.count == 2 { return String(localized: "\(names[0]) and \(names[1])") }
+        return names.joined(separator: ", ")
+    }
+
+    static func save(_ ids: [String]) {
+        var unique: [String] = []
+        for id in ids where ExerciseLibrary.freeIDs.contains(id) && !unique.contains(id) {
+            unique.append(id)
+            if unique.count == limit { break }
+        }
+        UserDefaults.standard.set(unique.joined(separator: ","), forKey: storageKey)
+    }
+
+    /// Pro unlocks coaching on every exercise. Otherwise only the two saved picks.
+    static func unlockedIDs(isPro: Bool) -> Set<String> {
+        if isPro { return Set(ExerciseLibrary.all.map(\.id)) }
+        return ids
+    }
+}
+
 enum CameraAngle {
     case side, front
 
@@ -96,7 +183,8 @@ struct ExerciseSpec: Identifiable {
     let muscles: [String]
     let symbol: String
     let camera: CameraAngle
-    let isFree: Bool
+    /// Empty means the exercise is free. Any program here makes the exercise part of Spotter Pro.
+    let programs: [ExerciseProgram]
     /// Joints that must be visible for coaching to work.
     let required: [JointRole]
     let bothSidesRequired: Bool
@@ -104,6 +192,8 @@ struct ExerciseSpec: Identifiable {
     let rules: [FormRule]
     let steps: [String]
     var note: String? = nil
+
+    var isFree: Bool { programs.isEmpty }
 
     var countingDescription: String {
         switch kind {

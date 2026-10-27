@@ -4,8 +4,13 @@ import CoreGraphics
 /// All supported exercises and their AI form checks.
 /// Thresholds are tuned for typical adult proportions; adjust here to make coaching stricter or looser.
 enum ExerciseLibrary {
-    static let all: [ExerciseSpec] = [squat, pushUp, plank, lunge, gluteBridge, romanianDeadlift, hipThrust, benchPress, bentOverRow, overheadPress, bicepCurl, lateralRaise]
+    static let all: [ExerciseSpec] = [squat, pushUp, plank, lunge, gluteBridge, romanianDeadlift, hipThrust, benchPress, bentOverRow, overheadPress, bicepCurl, lateralRaise] + ExerciseCatalog.extra
     static let freeIDs: Set<String> = Set(all.filter(\.isFree).map(\.id))
+    static var free: [ExerciseSpec] { all.filter(\.isFree) }
+
+    static func listed(in program: ExerciseProgram) -> [ExerciseSpec] {
+        all.filter { $0.programs.contains(program) }
+    }
 
     static func spec(_ id: String) -> ExerciseSpec { all.first { $0.id == id } ?? squat }
 
@@ -16,7 +21,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Bodyweight · Goblet · Barbell"),
         muscles: [String(localized: "Quads"), String(localized: "Glutes"), String(localized: "Core")],
         symbol: "figure.strengthtraining.functional",
-        camera: .side, isFree: true,
+        camera: .side, programs: [],
         required: [.shoulder, .hip, .knee, .ankle], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.hipDepth(s) },
@@ -42,7 +47,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Bodyweight"),
         muscles: [String(localized: "Chest"), String(localized: "Triceps"), String(localized: "Shoulders"), String(localized: "Core")],
         symbol: "figure.strengthtraining.traditional",
-        camera: .side, isFree: true,
+        camera: .side, programs: [],
         required: [.shoulder, .elbow, .wrist, .hip, .knee], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.elbowAngle(s) },
@@ -67,7 +72,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Bodyweight"),
         muscles: [String(localized: "Core"), String(localized: "Shoulders"), String(localized: "Glutes")],
         symbol: "figure.core.training",
-        camera: .side, isFree: true,
+        camera: .side, programs: [],
         required: [.shoulder, .hip, .ankle], bothSidesRequired: false,
         kind: .hold(HoldConfig(
             inPosition: { p, s in (p.bodyTilt(s) ?? 0) > 55 },
@@ -90,7 +95,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Bodyweight · Dumbbells"),
         muscles: [String(localized: "Quads"), String(localized: "Glutes"), String(localized: "Balance")],
         symbol: "figure.cross.training",
-        camera: .side, isFree: false,
+        camera: .side, programs: [],
         required: [.shoulder, .hip, .knee, .ankle], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, _ in [p.kneeAngle(.left), p.kneeAngle(.right)].compactMap { $0 }.min() },
@@ -112,7 +117,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Bodyweight · Mat"),
         muscles: [String(localized: "Glutes"), String(localized: "Hamstrings"), String(localized: "Lower back")],
         symbol: "figure.cooldown",
-        camera: .side, isFree: false,
+        camera: .side, programs: [],
         required: [.shoulder, .hip, .knee, .ankle], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.hipAngle(s) },
@@ -140,7 +145,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Barbell · Dumbbells"),
         muscles: [String(localized: "Hamstrings"), String(localized: "Glutes"), String(localized: "Back")],
         symbol: "figure.strengthtraining.traditional",
-        camera: .side, isFree: false,
+        camera: .side, programs: [],
         required: [.shoulder, .wrist, .hip, .knee, .ankle], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.hipAngle(s) },
@@ -169,7 +174,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Dumbbells · Barbell"),
         muscles: [String(localized: "Shoulders"), String(localized: "Triceps"), String(localized: "Upper chest")],
         symbol: "figure.strengthtraining.traditional",
-        camera: .front, isFree: false,
+        camera: .front, programs: [],
         required: [.shoulder, .elbow, .wrist, .hip], bothSidesRequired: true,
         kind: .reps(RepConfig(
             metric: { p, _ in p.bothSides { p.elbowAngle($0) } },
@@ -192,7 +197,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Dumbbells · Barbell · Cable"),
         muscles: [String(localized: "Biceps"), String(localized: "Forearms")],
         symbol: "dumbbell.fill",
-        camera: .side, isFree: false,
+        camera: .side, programs: [],
         required: [.shoulder, .elbow, .wrist, .hip], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.elbowAngle(s) },
@@ -217,7 +222,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Dumbbells · Cable"),
         muscles: [String(localized: "Side delts"), String(localized: "Upper traps")],
         symbol: "figure.arms.open",
-        camera: .front, isFree: false,
+        camera: .front, programs: [],
         required: [.shoulder, .elbow, .hip], bothSidesRequired: true,
         kind: .reps(RepConfig(
             metric: { p, _ in p.bothSides { p.armToTorso($0) } },
@@ -242,7 +247,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Barbell · Dumbbells"),
         muscles: [String(localized: "Chest"), String(localized: "Triceps"), String(localized: "Shoulders")],
         symbol: "figure.strengthtraining.traditional",
-        camera: .side, isFree: false,
+        camera: .side, programs: [],
         required: [.shoulder, .elbow, .wrist, .hip], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.elbowAngle(s) },
@@ -266,7 +271,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Barbell · Dumbbells"),
         muscles: [String(localized: "Upper back"), String(localized: "Lats"), String(localized: "Biceps")],
         symbol: "figure.rowing",
-        camera: .side, isFree: false,
+        camera: .side, programs: [],
         required: [.shoulder, .elbow, .wrist, .hip, .knee], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.elbowAngle(s) },
@@ -290,7 +295,7 @@ enum ExerciseLibrary {
         equipment: String(localized: "Barbell · Bench"),
         muscles: [String(localized: "Glutes"), String(localized: "Hamstrings")],
         symbol: "figure.flexibility",
-        camera: .side, isFree: false,
+        camera: .side, programs: [],
         required: [.shoulder, .hip, .knee, .ankle], bothSidesRequired: false,
         kind: .reps(RepConfig(
             metric: { p, s in p.hipAngle(s) },

@@ -6,6 +6,7 @@ struct ProfileView: View {
     @EnvironmentObject private var router: AppRouter
     @ObservedObject private var push = PushManager.shared
     @AppStorage("voiceEnabled") private var voiceEnabled = true
+    @AppStorage("freeCoachingIDs") private var freeCoachingRaw = ""
     @AppStorage("place") private var placeRaw = TrainingPlace.home.rawValue
     @AppStorage("level") private var levelRaw = Level.beginner.rawValue
     @AppStorage("goal") private var goalRaw = Goal.strength.rawValue
@@ -14,6 +15,15 @@ struct ProfileView: View {
     @AppStorage("heightUnit") private var heightUnitRaw = Measure.Height.centimeters.rawValue
     @AppStorage(DayReminder.hourKey) private var reminderHour = 8
     @AppStorage(DayReminder.minuteKey) private var reminderMinute = 0
+
+    private var coachFooter: String {
+        _ = freeCoachingRaw
+        let names = FreeCoaching.displayNames
+        if store.isPro || names.isEmpty {
+            return String(localized: "Spotter speaks rep counts and form corrections and lowers your music while it talks.")
+        }
+        return String(localized: "Live form coaching is free on \(names). Other exercises count reps without corrections until you upgrade. Voice still calls your rep count.")
+    }
 
     private var reminderTime: Binding<Date> {
         Binding(
@@ -110,7 +120,7 @@ struct ProfileView: View {
                             SpotterAnalytics.click("voice_coaching", screen: "profile", ["enabled": on ? "true" : "false"])
                         }
                 } header: { Text("Coach") } footer: {
-                    Text("Spotter speaks rep counts and form corrections and lowers your music while it talks.")
+                    Text(coachFooter)
                 }
 
                 Section {
