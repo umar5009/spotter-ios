@@ -9,9 +9,8 @@ struct OnboardingView: View {
     @AppStorage("level") private var levelRaw = Level.beginner.rawValue
     @State private var step = 0
     @State private var cameraGranted = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
-    @State private var coachingIDs: [String] = []
 
-    private let lastStep = 7
+    private let lastStep = 6
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,11 +56,8 @@ struct OnboardingView: View {
                         }
                     }
                 }
-                case 4: choice(title: "Pick 2 exercises for free coaching", subtitle: "Live form coaching stays free on these two. Every other exercise still counts your reps. Goal programs are part of Spotter Pro.") {
-                    FreeCoachingList(selected: $coachingIDs)
-                }
-                case 5: cameraStep
-                case 6: badgesStep
+                case 4: cameraStep
+                case 5: badgesStep
                 default: planReady
                 }
             }
@@ -82,8 +78,7 @@ struct OnboardingView: View {
     private var buttonTitle: String {
         switch step {
         case 0: return String(localized: "Get started")
-        case 4: return coachingIDs.count == FreeCoaching.limit ? String(localized: "Continue") : String(localized: "Choose 2 exercises")
-        case 5: return cameraGranted ? String(localized: "Continue") : String(localized: "Allow camera")
+        case 4: return cameraGranted ? String(localized: "Continue") : String(localized: "Allow camera")
         case lastStep: return String(localized: "Start my plan")
         default: return String(localized: "Continue")
         }
@@ -92,15 +87,7 @@ struct OnboardingView: View {
     private func advance() {
         Haptics.tap()
         SpotterAnalytics.click("onboarding_continue", screen: "onboarding", ["step": step])
-        if step == 4 {
-            guard coachingIDs.count == FreeCoaching.limit else {
-                Haptics.warning()
-                return
-            }
-            FreeCoaching.save(coachingIDs)
-            SpotterAnalytics.click("free_coaching_pick", screen: "onboarding", ["exercises": coachingIDs.joined(separator: ",")])
-        }
-        if step == 5 && !cameraGranted {
+        if step == 4 && !cameraGranted {
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.async {
                     cameraGranted = granted
@@ -110,7 +97,6 @@ struct OnboardingView: View {
             return
         }
         if step >= lastStep {
-            if coachingIDs.count == FreeCoaching.limit { FreeCoaching.save(coachingIDs) }
             onFinish()
         } else {
             withAnimation(.easeInOut(duration: 0.3)) { step += 1 }
@@ -208,11 +194,9 @@ struct OnboardingView: View {
                 Text("Every session adapts: hit your reps with a form score above 85 and Spotter will suggest progressing.")
                     .font(.subheadline)
                     .foregroundStyle(Theme.textSecondary)
-                if FreeCoaching.displayNames.isEmpty == false {
-                    Text("Live coaching is free on \(FreeCoaching.displayNames). 6-Pack, weight loss, and the other programs are part of Spotter Pro.")
-                        .font(.subheadline)
-                        .foregroundStyle(Theme.textSecondary)
-                }
+                Text("Live coaching is included on these exercises. 6-Pack, weight loss, and the other programs are part of Spotter Pro.")
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.textSecondary)
             }
             .padding(.horizontal, 20)
         }

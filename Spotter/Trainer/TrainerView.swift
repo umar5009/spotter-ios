@@ -18,7 +18,6 @@ struct TrainerView: View {
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
     @StateObject private var music = WorkoutMusicPlayer()
     @State private var showMusicLibrary = false
-    @State private var musicControlsVisible = false
 
     @State private var showCoachPaywall = false
 
@@ -28,7 +27,7 @@ struct TrainerView: View {
         _session = StateObject(wrappedValue: TrainerSession(
             plan: workout.plan,
             title: workout.title,
-            coachedIDs: FreeCoaching.unlockedIDs(isPro: pro)))
+            isPro: pro))
     }
 
     private var isSimulator: Bool {
@@ -109,42 +108,21 @@ struct TrainerView: View {
             VStack(spacing: 0) {
                 topBar
                 planProgress.padding(.top, 12)
-                if !session.liveCoaching {
-                    Button {
-                        SpotterAnalytics.click("open_paywall", screen: "workout", ["source": "coaching_locked", "exercise": session.spec.id])
-                        showCoachPaywall = true
-                    } label: {
-                        Pill(text: String(localized: "Form coaching is off · Unlock"), symbol: "lock.fill", color: Theme.violet)
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.top, 8)
-                }
                 if session.spec.category == .gym, !showMusicLibrary {
                     LoadStepper(session: session)
                         .padding(.top, 8)
                 }
                 if showMusicLibrary {
-                    WorkoutMusicLibrary(player: music, controlsVisible: $musicControlsVisible, isPresented: $showMusicLibrary)
+                    WorkoutMusicLibrary(player: music, isPresented: $showMusicLibrary)
                         .padding(.top, 8)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 } else {
-                if music.currentTrack == nil {
-                    HStack {
-                        musicButton
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.top, 8)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                HStack {
+                    musicButton
+                    Spacer(minLength: 0)
                 }
-                if music.currentTrack != nil {
-                    NowPlayingStrip(player: music, controlsVisible: $musicControlsVisible) {
-                        withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) {
-                            showMusicLibrary = true
-                        }
-                    }
-                    .padding(.top, 6)
-                }
+                .padding(.top, 8)
                 CueBanner(cue: session.cue).padding(.top, 10)
                 if demo != nil {
                     Pill(text: "Simulator demo · animated squat", symbol: "sparkles", color: Theme.violet).padding(.top, 8)
@@ -155,8 +133,6 @@ struct TrainerView: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
-            .animation(.spring(response: 0.35, dampingFraction: 0.88), value: music.currentTrack?.id)
-            .animation(.spring(response: 0.32, dampingFraction: 0.86), value: musicControlsVisible)
             .animation(.spring(response: 0.35, dampingFraction: 0.88), value: music.isPlaying)
 
             if session.stage == .active && !session.isHold {
@@ -431,7 +407,7 @@ struct LoadStepper: View {
         HStack(spacing: 10) {
             Text("Load")
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.white)
             Spacer(minLength: 0)
             stepButton("minus") { session.adjustLoad(by: -1, unit: unit) }
             Text(label)
@@ -442,7 +418,9 @@ struct LoadStepper: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(Color.white.opacity(0.08), in: Capsule())
+        .background(Color.black.opacity(0.72), in: Capsule())
+        .overlay(Capsule().stroke(Color.white.opacity(0.22), lineWidth: 1))
+        .shadow(color: .black.opacity(0.45), radius: 8, y: 3)
     }
 
     private var label: String {
@@ -460,7 +438,7 @@ struct LoadStepper: View {
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(width: 28, height: 28)
-                .background(Color.white.opacity(0.12), in: Circle())
+                .background(Color.white.opacity(0.22), in: Circle())
         }
         .buttonStyle(.plain)
     }
@@ -494,10 +472,6 @@ struct FramingCard: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
                 }
-            } else if !session.liveCoaching {
-                Text("Reps will count. Live form coaching is off for this exercise.")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.75))
             }
             HStack(spacing: 8) {
                 Circle().fill(session.inFrame ? Theme.accent : Theme.warn).frame(width: 9, height: 9)

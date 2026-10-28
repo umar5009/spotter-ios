@@ -1446,7 +1446,7 @@
         }
       }
     },
-    "%lld songs" : {
+    "%lld songs saved on this iPhone." : {
 
     },
     "%lld workouts" : {
@@ -1822,7 +1822,7 @@
     "6-Pack" : {
 
     },
-    "6-Pack, weight loss, and live coaching on every exercise" : {
+    "6-Pack, weight loss, muscle, strength, glutes, and mobility" : {
 
     },
     "7 days free, then %@/year. Cancel anytime in Settings." : {
@@ -3302,6 +3302,9 @@
           }
         }
       }
+    },
+    "Allow Media & Apple Music access in Settings to play songs saved on this iPhone. A subscription is not required. The workout mix still plays." : {
+
     },
     "Alternate home and gym days" : {
       "localizations" : {
@@ -5744,9 +5747,6 @@
     "Chest stays toward the floor" : {
 
     },
-    "Choose 2 exercises" : {
-
-    },
     "Choose kilograms or pounds, and centimetres or feet and inches. BMI uses the same numbers either way. Healthy for most adults is 18.5–24.9." : {
       "localizations" : {
         "ar" : {
@@ -6715,6 +6715,9 @@
 
     },
     "Delts" : {
+
+    },
+    "Demonstration of %@" : {
 
     },
     "Directions" : {
@@ -9110,9 +9113,6 @@
     "Form Champ" : {
 
     },
-    "Form coaching is off · Unlock" : {
-
-    },
     "Form score · last 7 days" : {
       "localizations" : {
         "ar" : {
@@ -9229,16 +9229,13 @@
         }
       }
     },
+    "Form scores show up on coached sets. Goal programs are part of Spotter Pro." : {
+
+    },
     "Free" : {
 
     },
-    "Free coach" : {
-
-    },
     "Free exercises" : {
-
-    },
-    "Free gym songs in %@." : {
 
     },
     "From you" : {
@@ -11085,9 +11082,6 @@
           }
         }
       }
-    },
-    "Hide playback controls" : {
-
     },
     "High" : {
       "localizations" : {
@@ -13179,19 +13173,7 @@
         }
       }
     },
-    "Live coaching is free on %@. 6-Pack, weight loss, and the other programs are part of Spotter Pro." : {
-
-    },
-    "Live form coaching is free on %@. Other exercises count reps without corrections until you upgrade. Voice still calls your rep count." : {
-
-    },
-    "Live form coaching is free on the two exercises you picked. This one counts your reps without corrections." : {
-
-    },
-    "Live form coaching is free on the two exercises you picked. Unlock it for every exercise." : {
-
-    },
-    "Live form coaching stays free on these two. Every other exercise still counts your reps. Goal programs are part of Spotter Pro." : {
+    "Live coaching is included on these exercises. 6-Pack, weight loss, and the other programs are part of Spotter Pro." : {
 
     },
     "Load" : {
@@ -15032,6 +15014,9 @@
     "Move, then stop." : {
 
     },
+    "Music by Kevin MacLeod (incompetech.com), CC BY 4.0." : {
+
+    },
     "Nearby gyms" : {
 
     },
@@ -15522,9 +15507,6 @@
           }
         }
       }
-    },
-    "No gym songs were found for your country. Try again." : {
-
     },
     "No gyms showed up nearby." : {
 
@@ -16296,9 +16278,6 @@
         }
       }
     },
-    "Other songs" : {
-
-    },
     "Over" : {
       "localizations" : {
         "ar" : {
@@ -16597,9 +16576,6 @@
           }
         }
       }
-    },
-    "Pick 2 exercises for free coaching" : {
-
     },
     "Pike your hips higher" : {
 
@@ -18927,13 +18903,7 @@
         }
       }
     },
-    "Reps are free" : {
-
-    },
     "Reps counted" : {
-
-    },
-    "Reps will count. Live form coaching is off for this exercise." : {
 
     },
     "Reserve" : {
@@ -19653,6 +19623,9 @@
           }
         }
       }
+    },
+    "Saved on this iPhone" : {
+
     },
     "Score 85 or higher on 5 workouts." : {
 
@@ -20489,9 +20462,6 @@
         }
       }
     },
-    "Show playback controls" : {
-
-    },
     "Show up like someone is counting. The streak is." : {
       "localizations" : {
         "ar" : {
@@ -21132,6 +21102,15 @@
           }
         }
       }
+    },
+    "Song" : {
+
+    },
+    "Songs saved on this iPhone. No Apple Music subscription needed." : {
+
+    },
+    "Songs saved on this iPhone. No subscription needed." : {
+
     },
     "Spotter" : {
       "localizations" : {
@@ -23086,9 +23065,6 @@
         }
       }
     },
-    "Start workout" : {
-
-    },
     "Stay hinged. Chest toward the floor" : {
 
     },
@@ -24212,6 +24188,9 @@
         }
       }
     },
+    "The workout mix couldn't be loaded." : {
+
+    },
     "This day hasn't happened yet." : {
       "localizations" : {
         "ar" : {
@@ -24269,6 +24248,9 @@
           }
         }
       }
+    },
+    "This iPhone" : {
+
     },
     "This month" : {
       "localizations" : {
@@ -24449,6 +24431,9 @@
           }
         }
       }
+    },
+    "Those songs aren't saved on this iPhone. Apple Music streams need a subscription. Choose a downloaded song, or use the workout mix." : {
+
     },
     "Three" : {
       "localizations" : {
@@ -25640,9 +25625,6 @@
         }
       }
     },
-    "Unlock live coaching" : {
-
-    },
     "Unlock with Spotter Pro" : {
       "localizations" : {
         "ar" : {
@@ -26786,6 +26768,12 @@
           }
         }
       }
+    },
+    "Workout mix" : {
+
+    },
+    "Workout mix. No Apple Music subscription. You can also play songs saved on this iPhone." : {
+
     },
     "Workout music" : {
 

@@ -30,7 +30,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Spotter plays popular gym songs by singers from your country through Apple Music."
+            "value" : "Spotter plays songs saved on this iPhone during a workout. An Apple Music subscription is not required."
           }
         }
       }
@@ -107,7 +107,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Spotter uses your location while you use the app to find nearby gyms, draw a route, and choose gym songs from your country."
+            "value" : "Spotter uses your location while you use the app to find nearby gyms and draw a route."
           }
         }
       }

@@ -1,3 +1,4 @@
+import MediaPlayer
 import SwiftUI
 
 /// Vertical music tab on the live camera.
@@ -10,32 +11,23 @@ struct MusicSidebarButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            ZStack {
                 if playing {
                     MiniEqualizer(playing: true, color: .black)
                 } else {
-                    Image(systemName: "music.note")
+                    Image(systemName: libraryOpen ? "xmark" : "music.note")
                         .font(.system(size: 16, weight: .bold))
-                }
-                VStack(spacing: -1) {
-                    ForEach(Array("MUSIC".enumerated()), id: \.offset) { _, character in
-                        Text(String(character))
-                            .font(.system(size: 10, weight: .heavy))
-                    }
                 }
             }
             .foregroundStyle(filled ? Color.black : Color.white)
-            .padding(.vertical, 12)
-            .padding(.horizontal, 8)
+            .frame(width: 44, height: 44)
             .background {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(filled ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(.ultraThinMaterial))
+                Circle().fill(filled ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Color.black.opacity(0.72)))
             }
             .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(Color.white.opacity(filled ? 0 : 0.16), lineWidth: 1)
+                Circle().stroke(Color.white.opacity(filled ? 0 : 0.22), lineWidth: 1)
             }
-            .shadow(color: .black.opacity(0.28), radius: 8, y: 4)
+            .shadow(color: .black.opacity(0.45), radius: 8, y: 3)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("Workout music"))
@@ -43,11 +35,9 @@ struct MusicSidebarButton: View {
     }
 }
 
-/// Song title on the camera. Tap it to reveal previous, play, and next without leaving the workout.
+/// Playback controls shown with the song list after the music button is tapped.
 struct NowPlayingStrip: View {
     @ObservedObject var player: WorkoutMusicPlayer
-    @Binding var controlsVisible: Bool
-    var onBrowse: () -> Void
 
     @State private var scrubTime: TimeInterval = 0
     @State private var isScrubbing = false
@@ -59,67 +49,28 @@ struct NowPlayingStrip: View {
 
     var body: some View {
         if let track = player.currentTrack {
-            VStack(alignment: .leading, spacing: controlsVisible ? 8 : 0) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
-                    Button {
-                        let show = !controlsVisible
-                        withAnimation(.spring(response: 0.32, dampingFraction: 0.86)) {
-                            controlsVisible = show
-                        }
-                        Haptics.tap()
-                        SpotterAnalytics.click(show ? "show_music_controls" : "hide_music_controls", screen: "workout")
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "music.note")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(Theme.accent)
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(track.title)
-                                    .font(.system(size: 14, weight: .bold))
-                                    .lineLimit(1)
-                                if controlsVisible {
-                                    Text(track.artist)
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundStyle(.white.opacity(0.65))
-                                        .lineLimit(1)
-                                }
-                            }
-                            MiniEqualizer(playing: player.isPlaying && !player.isBuffering)
-                            Image(systemName: controlsVisible ? "chevron.down" : "chevron.up")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundStyle(.white.opacity(0.7))
-                            Spacer(minLength: 0)
-                        }
-                        .foregroundStyle(.white)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(player.isPlaying ? "\(track.title) is playing" : "\(track.title) is paused"))
-                    .accessibilityHint(Text(controlsVisible ? "Hide playback controls" : "Show playback controls"))
-
-                    Button {
-                        onBrowse()
-                        Haptics.tap()
-                        SpotterAnalytics.click("open_workout_music", screen: "workout", ["source": "player"])
-                    } label: {
-                        Image(systemName: "music.note.list")
+                    Image(systemName: "music.note")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Theme.accent)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(track.title)
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.black)
-                            .frame(width: 32, height: 32)
-                            .background(Theme.accent, in: Circle())
+                            .lineLimit(1)
+                        Text(track.artist)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.65))
+                            .lineLimit(1)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text("Other songs"))
+                    Spacer(minLength: 0)
+                    MiniEqualizer(playing: player.isPlaying && !player.isBuffering)
                 }
-                if let error = player.catalogError, !controlsVisible {
-                    Text(error)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.75))
-                        .lineLimit(2)
-                }
+                .foregroundStyle(.white)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(Text(player.isPlaying ? "\(track.title) is playing" : "\(track.title) is paused"))
 
-                if controlsVisible {
-                    VStack(spacing: 2) {
+                VStack(spacing: 2) {
                         Slider(
                             value: Binding(
                                 get: { isScrubbing ? scrubTime : player.currentTime },
@@ -156,29 +107,10 @@ struct NowPlayingStrip: View {
                         transport
                         Spacer(minLength: 0)
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                }
             }
-            .padding(.leading, 14)
-            .padding(.trailing, 14)
-            .padding(.vertical, controlsVisible ? 10 : 9)
-            .background {
-                if controlsVisible {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous).fill(.ultraThinMaterial)
-                    RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Color.black.opacity(0.2))
-                } else {
-                    Capsule().fill(.ultraThinMaterial)
-                    Capsule().fill(Color.black.opacity(0.32))
-                }
-            }
-            .overlay {
-                if controlsVisible {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(Color.white.opacity(0.14), lineWidth: 1)
-                } else {
-                    Capsule().stroke(Color.white.opacity(0.14), lineWidth: 1)
-                }
-            }
-            .shadow(color: .black.opacity(0.35), radius: 10, y: 4)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color.black.opacity(0.35), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
     }
 
@@ -230,8 +162,8 @@ struct NowPlayingStrip: View {
 /// Song list over the live camera. Playback continues on the workout screen.
 struct WorkoutMusicLibrary: View {
     @ObservedObject var player: WorkoutMusicPlayer
-    @Binding var controlsVisible: Bool
     @Binding var isPresented: Bool
+    @State private var showPhoneLibrary = false
 
     var body: some View {
         libraryCard
@@ -264,6 +196,39 @@ struct WorkoutMusicLibrary: View {
                 .padding(.top, 14)
                 .padding(.bottom, 8)
 
+                HStack(spacing: 8) {
+                    Button {
+                        player.showWorkoutMix()
+                        Haptics.tap()
+                        SpotterAnalytics.click("show_workout_mix", screen: "workout")
+                    } label: {
+                        Label("Workout mix", systemImage: "music.note")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Theme.accent, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    Button {
+                        openPhoneLibrary()
+                    } label: {
+                        Label("This iPhone", systemImage: "iphone")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color.white.opacity(0.12), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 18)
+                .padding(.bottom, 8)
+
+                NowPlayingStrip(player: player)
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 8)
+
                 ScrollView {
                     VStack(spacing: 8) {
                         if player.isLoadingCatalog && player.tracks.isEmpty {
@@ -287,7 +252,9 @@ struct WorkoutMusicLibrary: View {
                             songRow(index: index, track: track)
                         }
                         if !player.tracks.isEmpty {
-                            Text("\(player.tracks.count) songs")
+                            Text(player.tracks.contains(where: { $0.artist == "Kevin MacLeod" })
+                                 ? BuiltInMix.credit
+                                 : String(localized: "\(player.tracks.count) songs saved on this iPhone."))
                                 .font(.system(size: 11, weight: .medium))
                                 .foregroundStyle(.white.opacity(0.45))
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -299,6 +266,11 @@ struct WorkoutMusicLibrary: View {
                 }
                 .frame(maxHeight: .infinity)
                 .onAppear { player.loadCatalog() }
+            }
+            .sheet(isPresented: $showPhoneLibrary) {
+                PhoneMusicPicker { songs in
+                    player.useSavedSongs(songs)
+                }
             }
             .contentShape(Rectangle())
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -315,14 +287,8 @@ struct WorkoutMusicLibrary: View {
         let current = player.currentIndex == index
         let playing = current && player.isPlaying
         return Button {
-            let switching = player.currentIndex != index
             let pausing = current && player.isPlaying
             player.select(index: index)
-            if switching {
-                withAnimation(.spring(response: 0.32, dampingFraction: 0.86)) {
-                    controlsVisible = false
-                }
-            }
             SpotterAnalytics.click(pausing ? "pause_workout_track" : "play_workout_track",
                                    screen: "workout",
                                    ["track": track.id])
@@ -379,11 +345,66 @@ struct WorkoutMusicLibrary: View {
         .accessibilityAddTraits(current ? .isSelected : [])
     }
 
+    private func openPhoneLibrary() {
+        Haptics.tap()
+        SpotterAnalytics.click("open_phone_music", screen: "workout")
+        switch MPMediaLibrary.authorizationStatus() {
+        case .authorized:
+            showPhoneLibrary = true
+        case .notDetermined:
+            MPMediaLibrary.requestAuthorization { status in
+                DispatchQueue.main.async {
+                    if status == .authorized {
+                        showPhoneLibrary = true
+                    } else {
+                        player.libraryAccessDenied()
+                    }
+                }
+            }
+        default:
+            player.libraryAccessDenied()
+        }
+    }
+
     private func close() {
         SpotterAnalytics.click("close_workout_music", screen: "workout")
         Haptics.tap()
         withAnimation(.spring(response: 0.38, dampingFraction: 0.88)) {
             isPresented = false
+        }
+    }
+}
+
+/// Picks songs already stored on this iPhone. Cloud-only Apple Music tracks stay hidden.
+struct PhoneMusicPicker: UIViewControllerRepresentable {
+    var onPick: ([GymSong]) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    func makeUIViewController(context: Context) -> MPMediaPickerController {
+        let picker = MPMediaPickerController(mediaTypes: .music)
+        picker.allowsPickingMultipleItems = true
+        picker.showsCloudItems = false
+        picker.showsItemsWithProtectedAssets = false
+        picker.prompt = String(localized: "Songs saved on this iPhone. No Apple Music subscription needed.")
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: MPMediaPickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    final class Coordinator: NSObject, MPMediaPickerControllerDelegate {
+        let parent: PhoneMusicPicker
+        init(_ parent: PhoneMusicPicker) { self.parent = parent }
+
+        func mediaPicker(_ mediaPicker: MPMediaPickerController, didPick mediaItemCollection: MPMediaItemCollection) {
+            parent.onPick(mediaItemCollection.items.compactMap(GymSong.saved(from:)))
+            parent.dismiss()
+        }
+
+        func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
+            parent.dismiss()
         }
     }
 }

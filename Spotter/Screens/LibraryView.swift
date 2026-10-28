@@ -3,7 +3,6 @@ import SwiftUI
 struct LibraryView: View {
     @EnvironmentObject private var store: StoreManager
     @EnvironmentObject private var router: AppRouter
-    @AppStorage("freeCoachingIDs") private var freeCoachingRaw = ""
     @AppStorage("level") private var levelRaw = Level.beginner.rawValue
     @State private var browse: Browse = .all
     @State private var showWeekPlan = false
@@ -65,7 +64,7 @@ struct LibraryView: View {
 
                     ForEach(items) { spec in
                         NavigationLink(value: spec.id) {
-                            ExerciseRow(spec: spec, locked: !spec.isFree && !store.isPro, freeCoach: !store.isPro && freeCoachingRaw.split(separator: ",").contains(Substring(spec.id)))
+                            ExerciseRow(spec: spec, locked: !spec.isFree && !store.isPro)
                         }
                         .buttonStyle(.plain)
                         .trackClick("exercise_open", screen: "exercises", ["exercise": spec.id])
@@ -144,7 +143,6 @@ struct LibraryView: View {
 struct ExerciseRow: View {
     let spec: ExerciseSpec
     let locked: Bool
-    var freeCoach: Bool = false
 
     var body: some View {
         HStack(spacing: 14) {
@@ -164,9 +162,6 @@ struct ExerciseRow: View {
                         Pill(text: program.title, symbol: program.symbol, color: Theme.violet)
                     } else {
                         Pill(text: spec.category.title, symbol: spec.category == .gym ? "dumbbell.fill" : "house.fill")
-                    }
-                    if freeCoach {
-                        Pill(text: String(localized: "Free coach"), symbol: "waveform", color: Theme.accent)
                     }
                 }
             }
@@ -190,20 +185,13 @@ struct ExerciseDetailView: View {
     @State private var weight: Double = 0
     @State private var rest = 60
     @State private var configured = false
-    @AppStorage("freeCoachingIDs") private var freeCoachingRaw = ""
 
     private var spec: ExerciseSpec { ExerciseLibrary.spec(exerciseID) }
     private var weightUnit: Measure.Weight { Measure.Weight(rawValue: weightUnitRaw) ?? .kilograms }
     private var locked: Bool { !spec.isFree && !store.isPro }
-    private var coachingOn: Bool {
-        _ = freeCoachingRaw
-        return store.isPro || FreeCoaching.includes(spec.id)
-    }
 
     private var startTitle: String {
-        if locked { return String(localized: "Unlock with Spotter Pro") }
-        if coachingOn { return String(localized: "Start with AI coach") }
-        return String(localized: "Start workout")
+        locked ? String(localized: "Unlock with Spotter Pro") : String(localized: "Start with AI coach")
     }
 
     var body: some View {
@@ -237,16 +225,6 @@ struct ExerciseDetailView: View {
                                     .background(Theme.accent, in: Circle())
                                 Text(step).foregroundStyle(.white).fixedSize(horizontal: false, vertical: true)
                             }
-                        }
-                    }
-                }
-                if !locked && !coachingOn {
-                    Card {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Label("Reps are free", systemImage: "checkmark.circle.fill")
-                                .font(.display(16, weight: .bold)).foregroundStyle(.white)
-                            Text("Live form coaching is free on the two exercises you picked. This one counts your reps without corrections.")
-                                .font(.subheadline).foregroundStyle(Theme.textSecondary)
                         }
                     }
                 }
@@ -290,21 +268,12 @@ struct ExerciseDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
-                if !locked && !coachingOn {
-                    Button {
-                        SpotterAnalytics.click("open_paywall", screen: "exercise", ["source": "coaching_locked", "exercise": spec.id])
-                        router.showPaywall = true
-                    } label: {
-                        Text("Unlock live coaching")
-                    }
-                    .buttonStyle(GlassButtonStyle())
-                }
                 Button {
                     if locked {
                         SpotterAnalytics.click("open_paywall", screen: "exercise", ["source": "locked_start", "exercise": spec.id])
                         router.showPaywall = true
                     } else {
-                        SpotterAnalytics.click("start_workout", screen: "exercise", ["exercise": spec.id, "coaching": coachingOn ? "true" : "false"])
+                        SpotterAnalytics.click("start_workout", screen: "exercise", ["exercise": spec.id, "coaching": "true"])
                         let item = PlannedExercise(exerciseID: spec.id, sets: sets, target: target, restSeconds: rest,
                                                    weightKg: spec.category == .gym ? weight : nil)
                         router.start(ActiveWorkout(title: spec.name, plan: [item]))
@@ -337,23 +306,13 @@ struct ExerciseDetailView: View {
 
     private var hero: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Image(systemName: spec.symbol)
-                .font(.system(size: 54, weight: .semibold))
-                .foregroundStyle(Theme.accent)
-                .frame(maxWidth: .infinity, minHeight: 150)
-                .background(
-                    RadialGradient(colors: [Theme.accent.opacity(0.25), Theme.surface], center: .center, startRadius: 4, endRadius: 200),
-                    in: RoundedRectangle(cornerRadius: 26, style: .continuous)
-                )
+            ExerciseDemoHero(spec: spec)
             Text(spec.equipment).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.textSecondary)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     ForEach(spec.muscles, id: \.self) { Pill(text: $0, color: .white) }
                     ForEach(spec.programs) { program in
                         Pill(text: program.title, symbol: program.symbol, color: Theme.violet)
-                    }
-                    if coachingOn && !store.isPro {
-                        Pill(text: String(localized: "Free coach"), symbol: "waveform", color: Theme.accent)
                     }
                 }
             }

@@ -56,7 +56,7 @@ struct WorkoutSummaryView: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Label("Reps counted", systemImage: "checkmark.circle.fill")
                                         .font(.display(17, weight: .bold)).foregroundStyle(.white)
-                                    Text("Live form coaching is free on the two exercises you picked. Unlock it for every exercise.")
+                                    Text("Form scores show up on coached sets. Goal programs are part of Spotter Pro.")
                                         .font(.subheadline).foregroundStyle(Theme.textSecondary)
                                 }
                             }

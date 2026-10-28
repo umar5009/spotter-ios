@@ -101,7 +101,6 @@ struct RootView: View {
     @EnvironmentObject private var store: StoreManager
     @State private var tab = 0
     @State private var showLaunch = true
-    @State private var showFreeCoaching = false
     @ObservedObject private var push = PushManager.shared
 
     var body: some View {
@@ -122,13 +121,7 @@ struct RootView: View {
             logScreen()
         }
         .onChange(of: onboarded) { _, done in
-            if done {
-                logScreen()
-                showFreeCoaching = !FreeCoaching.isChosen
-            }
-        }
-        .onAppear {
-            if onboarded { showFreeCoaching = !FreeCoaching.isChosen }
+            if done { logScreen() }
         }
         .onChange(of: store.isPro) { _, pro in
             SpotterAnalytics.sync(isPro: pro)
@@ -217,10 +210,6 @@ struct RootView: View {
         .sheet(isPresented: $router.showPaywall) {
             PaywallView()
                 .environmentObject(store)
-        }
-        .sheet(isPresented: $showFreeCoaching) {
-            FreeCoachingSetupView { showFreeCoaching = false }
-                .interactiveDismissDisabled()
         }
         .overlay { LossCelebrationLayer() }
     }

@@ -58,47 +58,6 @@ enum ExerciseProgram: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
-/// The two exercises chosen on first launch. Live form coaching is free only on these.
-enum FreeCoaching {
-    static let storageKey = "freeCoachingIDs"
-    static let limit = 2
-
-    static var orderedIDs: [String] {
-        let raw = UserDefaults.standard.string(forKey: storageKey) ?? ""
-        var unique: [String] = []
-        for id in raw.split(separator: ",").map(String.init) where ExerciseLibrary.freeIDs.contains(id) && !unique.contains(id) {
-            unique.append(id)
-            if unique.count == limit { break }
-        }
-        return unique
-    }
-
-    static var ids: Set<String> { Set(orderedIDs) }
-    static var isChosen: Bool { orderedIDs.count == limit }
-    static func includes(_ id: String) -> Bool { ids.contains(id) }
-
-    static var displayNames: String {
-        let names = orderedIDs.compactMap { id in ExerciseLibrary.all.first { $0.id == id }?.name }
-        if names.count == 2 { return String(localized: "\(names[0]) and \(names[1])") }
-        return names.joined(separator: ", ")
-    }
-
-    static func save(_ ids: [String]) {
-        var unique: [String] = []
-        for id in ids where ExerciseLibrary.freeIDs.contains(id) && !unique.contains(id) {
-            unique.append(id)
-            if unique.count == limit { break }
-        }
-        UserDefaults.standard.set(unique.joined(separator: ","), forKey: storageKey)
-    }
-
-    /// Pro unlocks coaching on every exercise. Otherwise only the two saved picks.
-    static func unlockedIDs(isPro: Bool) -> Set<String> {
-        if isPro { return Set(ExerciseLibrary.all.map(\.id)) }
-        return ids
-    }
-}
-
 enum CameraAngle {
     case side, front
 

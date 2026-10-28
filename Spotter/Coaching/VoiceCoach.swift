@@ -17,8 +17,7 @@ final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate, @unchecked Sendab
     private override init() {
         super.init()
         synthesizer.delegate = self
-        let audio = AVAudioSession.sharedInstance()
-        try? audio.setCategory(.playback, mode: .voicePrompt, options: [.duckOthers, .mixWithOthers])
+        WorkoutAudio.activate()
     }
 
     /// - Parameters:
@@ -36,7 +35,7 @@ final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate, @unchecked Sendab
         lastSpoken[k] = now
         lastAny = now
 
-        try? AVAudioSession.sharedInstance().setActive(true)
+        WorkoutAudio.activate()
         let utterance = AVSpeechUtterance(string: text)
         utterance.rate = 0.52
         utterance.pitchMultiplier = 1.0

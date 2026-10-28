@@ -64,10 +64,10 @@ final class TrainerSession: ObservableObject {
     private var lastHoldAnnouncement = 0
     private var watched: [String: String] = [:]
     private let voice = VoiceCoach.shared
-    /// Exercise IDs that receive live form cues and form-score talk.
-    private let coachedIDs: Set<String>
+    /// Goal-program exercises are coached only with Spotter Pro. Every other exercise is coached for free.
+    private let isPro: Bool
 
-    var liveCoaching: Bool { coachedIDs.contains(spec.id) }
+    var liveCoaching: Bool { spec.isFree || isPro }
 
     var current: PlannedExercise { plan[index] }
     var spec: ExerciseSpec { ExerciseLibrary.spec(current.exerciseID) }
@@ -76,11 +76,11 @@ final class TrainerSession: ObservableObject {
     var nextSpec: ExerciseSpec? { index + 1 < plan.count ? ExerciseLibrary.spec(plan[index + 1].exerciseID) : nil }
     var currentExerciseResults: [SetResult] { results.filter { $0.exerciseID == current.exerciseID } }
 
-    init(plan: [PlannedExercise], title: String, coachedIDs: Set<String>) {
+    init(plan: [PlannedExercise], title: String, isPro: Bool) {
         precondition(!plan.isEmpty, "A workout needs at least one exercise")
         self.plan = plan
         self.title = title
-        self.coachedIDs = coachedIDs
+        self.isPro = isPro
         self.analyzer = ExerciseAnalyzer(spec: ExerciseLibrary.spec(plan[0].exerciseID))
         self.weightKg = LiftLoad.resolved(plan[0])
     }
