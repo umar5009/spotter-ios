@@ -1,87 +1,175 @@
 import SwiftUI
 
-/// Current rank, the next badge, and every badge the log can award.
+/// The badge in progress, or the latest one earned, centered above a link to the full ladder.
 struct BadgeBoardView: View {
     let logs: [WorkoutLog]
     let weights: [WeightEntry]
-    var onSetTarget: () -> Void
 
     @AppStorage("goalWeightKg") private var goalWeightKg = 0.0
     @AppStorage(WeightLoss.startKey) private var lossStartKg = 0.0
     @AppStorage(WeightLoss.cadenceKey) private var cadenceRaw = LossCadence.week.rawValue
     @AppStorage(WeightLoss.periodKey) private var lossPeriodKg = 0.0
 
-    private var report: BadgeReport {
-        let cadence = LossCadence(rawValue: cadenceRaw) ?? .week
-        return BadgeBoard.report(
-            logs: logs,
-            weights: weights,
-            goalKg: goalWeightKg,
-            startKg: lossStartKg,
-            cadence: cadence,
-            periodKg: lossPeriodKg
-        )
-    }
-
-    private let columns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
+    private var report: BadgeReport { makeReport(logs: logs, weights: weights, goalKg: goalWeightKg, startKg: lossStartKg, cadenceRaw: cadenceRaw, periodKg: lossPeriodKg) }
 
     var body: some View {
         let report = self.report
-        Card {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Badges").eyebrow(Theme.accent)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(report.current?.title ?? String(localized: "No badge yet"))
-                        .font(.display(24, weight: .heavy))
+        VStack(spacing: 18) {
+            VStack(spacing: 12) {
+                if let current = report.current {
+                    badgeMark(current.symbol, earned: true, size: 96)
+                    Text(current.title)
+                        .font(.display(28, weight: .heavy))
                         .foregroundStyle(.white)
-                    Text(report.summary)
+                        .multilineTextAlignment(.center)
+                    Text("Earned")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Theme.accent)
+                } else if let next = report.next {
+                    badgeMark(next.badge.symbol, earned: false, size: 88)
+                    Text(next.badge.title)
+                        .font(.display(26, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                    Text(next.badge.requirement)
                         .font(.subheadline)
                         .foregroundStyle(Theme.textSecondary)
-                }
-                if let next = report.next {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(String(localized: "Next · \(next.badge.title)"))
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(.white)
-                        WeightLossBar(fraction: next.fraction)
-                        Text(next.progress)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Theme.textTertiary)
-                    }
-                }
-                LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(report.standings) { standing in
-                        cell(standing)
-                    }
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                    WeightLossBar(fraction: next.fraction)
+                        .frame(maxWidth: 220)
+                    Text(next.progress)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Theme.textTertiary)
                 }
             }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 4)
+
+            NavigationLink {
+                AllBadgesView(logs: logs, weights: weights)
+            } label: {
+                Text("See all badges")
+            }
+            .buttonStyle(GlassButtonStyle())
+            .trackClick("open_badges", screen: "progress")
         }
     }
 
-    private func cell(_ standing: BadgeStanding) -> some View {
-        let lockedGoal = standing.badge == .goalWeight && !standing.earned && goalWeightKg <= 0
-        return Button {
-            guard lockedGoal else { return }
-            SpotterAnalytics.click("open_loss_target", screen: "progress", ["source": "badge"])
-            onSetTarget()
-        } label: {
-            VStack(spacing: 6) {
-                Image(systemName: standing.badge.symbol)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(standing.earned ? Theme.accent : Theme.textTertiary)
-                Text(standing.badge.title)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(standing.earned ? .white : Theme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-            }
-            .frame(maxWidth: .infinity, minHeight: 84)
-            .padding(.horizontal, 6)
-            .background(standing.earned ? Theme.accentSoft : Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(standing.earned ? Theme.accent.opacity(0.45) : Theme.stroke))
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text("\(standing.badge.title), \(standing.progress)"))
+    private func badgeMark(_ symbol: String, earned: Bool, size: CGFloat) -> some View {
+        Image(systemName: symbol)
+            .font(.system(size: size * 0.38, weight: .semibold))
+            .foregroundStyle(earned ? Color.black : Theme.accent)
+            .frame(width: size, height: size)
+            .background(earned ? Theme.accent : Theme.accentSoft, in: Circle())
     }
+}
+
+/// Every badge in earn order, with the requirement and how close the log is.
+struct AllBadgesView: View {
+    let logs: [WorkoutLog]
+    let weights: [WeightEntry]
+
+    @AppStorage("goalWeightKg") private var goalWeightKg = 0.0
+    @AppStorage(WeightLoss.startKey) private var lossStartKg = 0.0
+    @AppStorage(WeightLoss.cadenceKey) private var cadenceRaw = LossCadence.week.rawValue
+    @AppStorage(WeightLoss.periodKey) private var lossPeriodKg = 0.0
+    @State private var showTarget = false
+
+    private var report: BadgeReport { makeReport(logs: logs, weights: weights, goalKg: goalWeightKg, startKg: lossStartKg, cadenceRaw: cadenceRaw, periodKg: lossPeriodKg) }
+
+    var body: some View {
+        let report = self.report
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Earn them in order. A badge stays once you qualify, even if a streak breaks.")
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 4)
+
+                ForEach(Array(report.standings.enumerated()), id: \.element.id) { index, standing in
+                    badgeRow(index: index, standing: standing, isNext: report.next?.badge == standing.badge)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+        }
+        .background(Theme.bg.ignoresSafeArea())
+        .navigationTitle("Badges")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showTarget) { WeightLossTargetSheet() }
+    }
+
+    private func badgeRow(index: Int, standing: BadgeStanding, isNext: Bool) -> some View {
+        Card {
+            HStack(alignment: .top, spacing: 12) {
+                Text("\(index + 1)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(standing.earned ? Color.black : .white)
+                    .frame(width: 28, height: 28)
+                    .background(standing.earned ? Theme.accent : Color.white.opacity(0.08), in: Circle())
+
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Image(systemName: standing.badge.symbol)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(standing.earned ? Theme.accent : Theme.textSecondary)
+                        Text(standing.badge.title)
+                            .font(.display(17, weight: .bold))
+                            .foregroundStyle(.white)
+                        Spacer(minLength: 8)
+                        if standing.earned {
+                            Text("Earned")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Theme.accent)
+                        } else if isNext {
+                            Text("Up next")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Theme.warn)
+                        }
+                    }
+                    Text(standing.badge.requirement)
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if !standing.earned {
+                        WeightLossBar(fraction: standing.fraction)
+                        Text(standing.progress)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Theme.textTertiary)
+                    }
+                    if standing.badge == .goalWeight && !standing.earned && goalWeightKg <= 0 {
+                        Button("Set a loss target") {
+                            SpotterAnalytics.click("open_loss_target", screen: "badges")
+                            showTarget = true
+                        }
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Theme.accent)
+                    }
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(index + 1). \(standing.badge.title). \(standing.badge.requirement). \(standing.progress)"))
+    }
+}
+
+private func makeReport(
+    logs: [WorkoutLog],
+    weights: [WeightEntry],
+    goalKg: Double,
+    startKg: Double,
+    cadenceRaw: String,
+    periodKg: Double
+) -> BadgeReport {
+    let cadence = LossCadence(rawValue: cadenceRaw) ?? .week
+    return BadgeBoard.report(
+        logs: logs,
+        weights: weights,
+        goalKg: goalKg,
+        startKg: startKg,
+        cadence: cadence,
+        periodKg: periodKg
+    )
 }

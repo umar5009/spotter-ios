@@ -9,6 +9,7 @@ enum DayReminder {
     private static let idPrefix = "spotter.day."
 
     static func reschedule() async {
+        await ProgressPhotoReminder.reschedule()
         let isPro = UserDefaults.standard.bool(forKey: "cachedIsPro")
         let center = UNUserNotificationCenter.current()
         let pending = await center.pendingNotificationRequests()

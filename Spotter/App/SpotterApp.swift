@@ -101,6 +101,7 @@ struct RootView: View {
     @EnvironmentObject private var store: StoreManager
     @State private var tab = 0
     @State private var showLaunch = true
+    @StateObject private var photos = ProgressPhotoCenter()
     @ObservedObject private var push = PushManager.shared
 
     var body: some View {
@@ -115,13 +116,16 @@ struct RootView: View {
             }
         }
         .onChange(of: tab) { _, new in
-            let names = ["today", "exercises", "gyms", "streaks", "progress", "profile"]
+            let names = ["today", "exercises", "gyms", "progress", "settings"]
             let name = names.indices.contains(new) ? names[new] : "today"
             SpotterAnalytics.click("tab", screen: "root", ["tab": name])
             logScreen()
         }
         .onChange(of: onboarded) { _, done in
-            if done { logScreen() }
+            if done {
+                logScreen()
+                if store.isPro { refreshPhotoPrompt() }
+            }
         }
         .onChange(of: store.isPro) { _, pro in
             SpotterAnalytics.sync(isPro: pro)
@@ -135,7 +139,15 @@ struct RootView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             push.refreshAuthorization()
             Task { await DayReminder.reschedule() }
+            refreshPhotoPrompt()
         }
+        .onChange(of: showLaunch) { _, _ in refreshPhotoPrompt() }
+        .onChange(of: router.showPaywall) { _, _ in refreshPhotoPrompt() }
+    }
+
+    private func refreshPhotoPrompt() {
+        guard onboarded, !showLaunch, router.activeWorkout == nil else { return }
+        photos.consider(paywallVisible: router.showPaywall)
     }
 
     private func logScreen() {
@@ -143,7 +155,7 @@ struct RootView: View {
             SpotterAnalytics.screen("onboarding")
             return
         }
-        let names = ["today", "exercises", "gyms", "streaks", "progress", "profile"]
+        let names = ["today", "exercises", "gyms", "progress", "settings"]
         SpotterAnalytics.screen(names.indices.contains(tab) ? names[tab] : "today")
     }
 
@@ -152,9 +164,11 @@ struct RootView: View {
         case "today": tab = 0
         case "exercises": tab = 1
         case "gyms": tab = 2
-        case "streaks": tab = 3
-        case "progress": tab = 4
-        case "profile": tab = 5
+        case "streaks", "progress": tab = 3
+        case "profile", "settings": tab = 4
+        case "progressPhoto":
+            tab = 3
+            photos.presentFromNotification()
         case "paywall":
             tab = 0
             router.showPaywall = true
@@ -176,15 +190,12 @@ struct RootView: View {
                     GymsView()
                         .tabItem { Label("Gyms", systemImage: "mappin.and.ellipse") }
                         .tag(2)
-                    StreaksView()
-                        .tabItem { Label("Streaks", systemImage: "flame.fill") }
-                        .tag(3)
                     ProgressScreen()
                         .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
-                        .tag(4)
+                        .tag(3)
                     ProfileView()
-                        .tabItem { Label("Profile", systemImage: "person.crop.circle") }
-                        .tag(5)
+                        .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+                        .tag(4)
                 }
             } else {
                 OnboardingView {
@@ -202,6 +213,8 @@ struct RootView: View {
             }
         }
         .environmentObject(router)
+        .environmentObject(photos)
+        .modifier(ProgressPhotoPrompt(photos: photos))
         .fullScreenCover(item: $router.activeWorkout) { workout in
             TrainerView(workout: workout)
                 .environmentObject(store)

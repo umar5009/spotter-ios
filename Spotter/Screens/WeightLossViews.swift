@@ -10,7 +10,6 @@ struct WeightLossCard: View {
     @AppStorage(WeightLoss.periodKey) private var lossPeriodKg = 0.0
     @AppStorage(WeightLoss.badgeKey) private var badgeGoalKg = 0.0
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
-    @State private var showLog = false
     @State private var showTarget = false
 
     private var unit: Measure.Weight { Measure.Weight(rawValue: weightUnitRaw) ?? .kilograms }
@@ -48,7 +47,6 @@ struct WeightLossCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(Theme.stroke))
-        .sheet(isPresented: $showLog) { WeightLogSheet() }
         .sheet(isPresented: $showTarget) { WeightLossTargetSheet() }
     }
 
@@ -72,15 +70,9 @@ struct WeightLossCard: View {
             Text(periodLine(status))
                 .font(.subheadline)
                 .foregroundStyle(Theme.textSecondary)
-            HStack(spacing: 16) {
-                Button("Log weight") {
-                    SpotterAnalytics.click("log_weight", screen: "progress")
-                    showLog = true
-                }
-                Button("Edit target") {
-                    SpotterAnalytics.click("open_loss_target", screen: "progress")
-                    showTarget = true
-                }
+            Button("Edit target") {
+                SpotterAnalytics.click("open_loss_target", screen: "progress")
+                showTarget = true
             }
             .font(.subheadline.weight(.bold))
             .foregroundStyle(Theme.accent)

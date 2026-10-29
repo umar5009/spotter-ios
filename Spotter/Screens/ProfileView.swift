@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct ProfileView: View {
     @EnvironmentObject private var store: StoreManager
@@ -9,7 +8,6 @@ struct ProfileView: View {
     @AppStorage("place") private var placeRaw = TrainingPlace.home.rawValue
     @AppStorage("level") private var levelRaw = Level.beginner.rawValue
     @AppStorage("goal") private var goalRaw = Goal.strength.rawValue
-    @AppStorage("onboarded") private var onboarded = true
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
     @AppStorage("heightUnit") private var heightUnitRaw = Measure.Height.centimeters.rawValue
     @AppStorage(DayReminder.hourKey) private var reminderHour = 8
@@ -49,15 +47,6 @@ struct ProfileView: View {
                         Task { await store.restore() }
                     }
                 } header: { Text("Membership") }
-
-                Section {
-                    NavigationLink {
-                        HistoryView()
-                    } label: {
-                        Label("Weight, workouts and exercises", systemImage: "clock.arrow.circlepath")
-                    }
-                    .trackClick("open_history", screen: "profile")
-                } header: { Text("History") }
 
                 Section {
                     Picker("Goal", selection: $goalRaw) {
@@ -133,37 +122,17 @@ struct ProfileView: View {
                 }
 
                 Section {
-                    Label("Pose detection runs entirely on your iPhone. Video is never recorded or uploaded.", systemImage: "lock.shield.fill")
+                    Label("Pose detection runs entirely on your iPhone. Workout video is never recorded or uploaded.", systemImage: "lock.shield.fill")
+                    Label("Progress selfies stay on this iPhone. They are shared only if you make a video and send it yourself.", systemImage: "person.crop.rectangle")
                         .font(.subheadline)
                     Label("Spotter is a training aid, not medical advice. Stop if you feel pain and talk to a professional about injuries.", systemImage: "heart.text.square.fill")
                         .font(.subheadline)
                 } header: { Text("Privacy & safety") }
-
-                #if DEBUG
-                Section {
-                    if let token = push.token {
-                        Button("Copy push token") {
-                            SpotterAnalytics.click("copy_push_token", screen: "profile")
-                            UIPasteboard.general.string = token
-                        }
-                    }
-                    Toggle("Unlock Pro (debug)", isOn: Binding(
-                        get: { UserDefaults.standard.bool(forKey: "debugPro") },
-                        set: {
-                            SpotterAnalytics.click("debug_pro", screen: "profile", ["enabled": $0 ? "true" : "false"])
-                            store.setDebugPro($0)
-                        }))
-                    Button("Replay onboarding") {
-                        SpotterAnalytics.click("replay_onboarding", screen: "profile")
-                        onboarded = false
-                    }
-                } header: { Text("Developer") }
-                #endif
             }
             .scrollContentBackground(.hidden)
             .background(Theme.bg.ignoresSafeArea())
             .onAppear { push.refreshAuthorization() }
-            .navigationTitle("Profile")
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarTitleDisplayMode(.inline)
         }

@@ -6,17 +6,12 @@ struct ProgressScreen: View {
     @Query(sort: \WorkoutLog.date) private var logs: [WorkoutLog]
     @Query(sort: \SetLog.date) private var sets: [SetLog]
     @Query(sort: \WeightEntry.date) private var weights: [WeightEntry]
-    @AppStorage("goalWeightKg") private var goalWeightKg = 0.0
-    @AppStorage("heightCm") private var heightCm = 0.0
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
-    @State private var showWeightLog = false
-    @State private var showTarget = false
 
     private var totalReps: Int { logs.reduce(0) { $0 + $1.totalReps } }
     private var avgForm: Int { logs.isEmpty ? 0 : logs.reduce(0) { $0 + $1.avgFormScore } / logs.count }
     private var streak: Int { Streak.current(from: logs.map(\.date)) }
     private var bestStreak: Int { Streak.longest(from: logs.map(\.date)) }
-    private var weightSnapshot: WeightTrend.Snapshot { WeightTrend.snapshot(from: weights) }
     private var weightUnit: Measure.Weight { Measure.Weight(rawValue: weightUnitRaw) ?? .kilograms }
 
     private var topFixes: [(String, Int)] {
@@ -53,28 +48,22 @@ struct ProgressScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    BadgeBoardView(logs: logs, weights: weights) {
-                        showTarget = true
-                    }
-                    if logs.isEmpty && weights.isEmpty {
-                        emptyState
-                    } else {
-                        weightCard
-                        if goalWeightKg > 0 { WeightLossCard() }
-                        if !logs.isEmpty {
-                            HStack(spacing: 10) {
-                                stat("\(logs.count)", "workouts", "figure.run")
-                                stat("\(totalReps)", "reps", "repeat")
-                                if bestStreak > streak {
-                                    stat("\(streak)", "streak · best \(bestStreak)", "flame.fill")
-                                } else {
-                                    stat("\(streak)", "day streak", "flame.fill")
-                                }
+                    BadgeBoardView(logs: logs, weights: weights)
+                    StreaksView()
+                    ProgressPhotoStrip()
+                    if !logs.isEmpty {
+                        HStack(spacing: 10) {
+                            stat("\(logs.count)", "workouts", "figure.run")
+                            stat("\(totalReps)", "reps", "repeat")
+                            if bestStreak > streak {
+                                stat("\(streak)", "streak · best \(bestStreak)", "flame.fill")
+                            } else {
+                                stat("\(streak)", "day streak", "flame.fill")
                             }
-                            formChart
-                            if !topFixes.isEmpty { fixesCard }
-                            exercisesCard
                         }
+                        formChart
+                        if !topFixes.isEmpty { fixesCard }
+                        exercisesCard
                     }
                 }
                 .padding(.horizontal, 16)
@@ -94,101 +83,6 @@ struct ProgressScreen: View {
                     .trackClick("open_history", screen: "progress")
                 }
             }
-            .sheet(isPresented: $showWeightLog) { WeightLogSheet() }
-            .sheet(isPresented: $showTarget) { WeightLossTargetSheet() }
-        }
-    }
-
-    private var weightCard: some View {
-        let snap = weightSnapshot
-        return Card {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("Body weight").eyebrow()
-                    Spacer()
-                    NavigationLink {
-                        HistoryView(initialTab: .weight)
-                    } label: {
-                        Text("History").font(.subheadline.weight(.bold)).foregroundStyle(Theme.accent)
-                    }
-                    .trackClick("open_weight_history", screen: "progress")
-                }
-                if let latest = snap.latest {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(Measure.format(weightUnit.fromKilograms(latest.weightKg))).font(.display(32, weight: .heavy)).foregroundStyle(.white)
-                        Text(weightUnit.symbol).foregroundStyle(Theme.textSecondary)
-                    }
-                    HStack(spacing: 10) {
-                        weightTile("This week", snap.weekDelta)
-                        weightTile("This month", snap.monthDelta)
-                    }
-                    BMIReadout(weightKg: latest.weightKg, heightCm: heightCm) {
-                        SpotterAnalytics.click("log_weight", screen: "progress", ["source": "add_height"])
-                        showWeightLog = true
-                    }
-                    if goalWeightKg <= 0 {
-                        Button("Set a loss target") {
-                            SpotterAnalytics.click("open_loss_target", screen: "progress", ["source": "weight"])
-                            showTarget = true
-                        }
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Theme.accent)
-                    }
-                    Button("Log weight") {
-                        SpotterAnalytics.click("log_weight", screen: "progress")
-                        showWeightLog = true
-                    }
-                        .buttonStyle(PrimaryButtonStyle())
-                } else {
-                    Text("Weigh in to track loss by week and by month.")
-                        .font(.subheadline)
-                        .foregroundStyle(Theme.textSecondary)
-                    if goalWeightKg <= 0 {
-                        Button("Set a loss target") {
-                            SpotterAnalytics.click("open_loss_target", screen: "progress", ["source": "weight"])
-                            showTarget = true
-                        }
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Theme.accent)
-                    }
-                    Button("Log weight") {
-                        SpotterAnalytics.click("log_weight", screen: "progress")
-                        showWeightLog = true
-                    }
-                        .buttonStyle(PrimaryButtonStyle())
-                }
-            }
-        }
-    }
-
-    private func weightTile(_ title: LocalizedStringKey, _ delta: Double?) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.caption.weight(.bold)).foregroundStyle(Theme.textTertiary)
-            Text(WeightTrend.changeLabel(delta, unit: weightUnit))
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(weightColor(delta))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-
-    private func weightColor(_ delta: Double?) -> Color {
-        guard let delta, abs(delta) >= 0.05 else { return Theme.textSecondary }
-        return delta < 0 ? Theme.accent : Theme.warn
-    }
-
-    private var emptyState: some View {
-        VStack(spacing: 14) {
-            Image(systemName: "chart.line.uptrend.xyaxis")
-                .font(.system(size: 44, weight: .semibold))
-                .foregroundStyle(Theme.accent)
-                .padding(.top, 12)
-            Text("Your progress lives here").font(.display(22, weight: .bold)).foregroundStyle(.white)
-            Text("Finish your first coached workout to see your form score trend, personal bests and the one fix that will improve you most.")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Theme.textSecondary)
-                .padding(.horizontal, 32)
         }
     }
 

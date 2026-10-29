@@ -277,7 +277,7 @@
 				INFOPLIST_FILE = "Spotter-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Spotter;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Spotter uses your camera to track your body position and correct your form in real time. Video is processed on your iPhone and never recorded or uploaded.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Spotter uses the camera to coach your form and to take progress selfies you choose to save. Workout video is processed on your iPhone and is never recorded or uploaded.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -314,7 +314,7 @@
 				INFOPLIST_FILE = "Spotter-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Spotter;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Spotter uses your camera to track your body position and correct your form in real time. Video is processed on your iPhone and never recorded or uploaded.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Spotter uses the camera to coach your form and to take progress selfies you choose to save. Workout video is processed on your iPhone and is never recorded or uploaded.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;

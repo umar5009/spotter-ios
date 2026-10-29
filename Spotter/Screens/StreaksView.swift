@@ -11,23 +11,12 @@ struct StreaksView: View {
     private var days: [StreakCalendar.Day] { StreakCalendar.rankedDays(logs: logs, sets: sets) }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    StreakCalendarCard(logs: logs, sets: sets, weights: weights)
-                    bestDays
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 24)
-            }
-            .background(Theme.bg.ignoresSafeArea())
-            .navigationTitle("Streaks")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarTitleDisplayMode(.inline)
-            .sheet(item: $selected) { day in
-                DayReportView(report: StreakCalendar.report(for: day.date, logs: logs, sets: sets, weights: weights))
-            }
+        VStack(alignment: .leading, spacing: 16) {
+            StreakCalendarCard(logs: logs, sets: sets, weights: weights)
+            bestDays
+        }
+        .sheet(item: $selected) { day in
+            DayReportView(report: StreakCalendar.report(for: day.date, logs: logs, sets: sets, weights: weights))
         }
     }
 

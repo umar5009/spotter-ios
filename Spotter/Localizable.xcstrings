@@ -1259,6 +1259,16 @@
         }
       }
     },
+    "%lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld"
+          }
+        }
+      }
+    },
     "%lld of %lld %@" : {
       "localizations" : {
         "en" : {
@@ -1454,6 +1464,16 @@
     },
     "%lld-day streak" : {
 
+    },
+    "%lld. %@. %@. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld. %2$@. %3$@. %4$@"
+          }
+        }
+      }
     },
     "%lld%%" : {
 
@@ -1819,10 +1839,10 @@
         }
       }
     },
-    "6-Pack" : {
+    "5 pictures saved" : {
 
     },
-    "6-Pack, weight loss, muscle, strength, glutes, and mobility" : {
+    "6-Pack" : {
 
     },
     "7 days free, then %@/year. Cancel anytime in Settings." : {
@@ -1998,6 +2018,9 @@
           }
         }
       }
+    },
+    "10-second video" : {
+
     },
     "20 and 400 kg" : {
       "localizations" : {
@@ -2594,6 +2617,9 @@
         }
       }
     },
+    "A picture today starts a 10-second before-and-after. Spotter can remind you each week or month to add the next one." : {
+
+    },
     "A reminder each day names that day's exercises. Turn them off here, or in iOS Settings." : {
 
     },
@@ -2954,6 +2980,24 @@
           }
         }
       }
+    },
+    "Add a picture to your 10-second before-and-after." : {
+
+    },
+    "Add this month's picture to your 10-second before-and-after." : {
+
+    },
+    "Add this month's selfie to your 10-second progress video." : {
+
+    },
+    "Add this week's picture to your 10-second before-and-after." : {
+
+    },
+    "Add this week's selfie to your 10-second progress video." : {
+
+    },
+    "Add up to 5 selfies. Spotter makes a 10-second video with Week 1 to Week 5 slides and music." : {
+
     },
     "Add your height to see your range" : {
       "localizations" : {
@@ -3913,6 +3957,9 @@
         }
       }
     },
+    "Before selfie" : {
+
+    },
     "Beginner" : {
       "localizations" : {
         "ar" : {
@@ -4515,6 +4562,7 @@
       }
     },
     "Body weight" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5804,6 +5852,9 @@
           }
         }
       }
+    },
+    "Choose weekly or monthly pictures so you can see your progress, then turn them into a video for friends." : {
+
     },
     "Clear" : {
 
@@ -7440,6 +7491,9 @@
         }
       }
     },
+    "Earn them in order. A badge stays once you qualify, even if a streak breaks." : {
+
+    },
     "Earned" : {
 
     },
@@ -8647,6 +8701,7 @@
       }
     },
     "Finish your first coached workout to see your form score trend, personal bests and the one fix that will improve you most." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8761,6 +8816,9 @@
           }
         }
       }
+    },
+    "Five pictures is the limit for a 10-second video." : {
+
     },
     "Flags rushed lowering. Slow eccentrics build more muscle." : {
       "localizations" : {
@@ -11559,6 +11617,9 @@
         }
       }
     },
+    "How often should Spotter ask?" : {
+
+    },
     "How to do it" : {
       "localizations" : {
         "ar" : {
@@ -12628,6 +12689,9 @@
       }
     },
     "Last time: %@." : {
+
+    },
+    "Later" : {
 
     },
     "Lateral Raise" : {
@@ -14422,10 +14486,19 @@
     "Lunges, a step-up, and a bridge." : {
 
     },
+    "Make a 10-second video" : {
+
+    },
     "Make a U-turn" : {
 
     },
     "Make a U-turn onto %@" : {
+
+    },
+    "Make video" : {
+
+    },
+    "Making your 10-second video" : {
 
     },
     "Membership" : {
@@ -14720,6 +14793,9 @@
           }
         }
       }
+    },
+    "Monthly progress picture" : {
+
     },
     "More" : {
       "localizations" : {
@@ -15081,9 +15157,6 @@
         }
       }
     },
-    "Next · %@" : {
-
-    },
     "Next up: %@. %@" : {
       "localizations" : {
         "ar" : {
@@ -15271,9 +15344,6 @@
       }
     },
     "Nice" : {
-
-    },
-    "No badge yet" : {
 
     },
     "No change" : {
@@ -15809,6 +15879,9 @@
           }
         }
       }
+    },
+    "Not now" : {
+
     },
     "Notifications" : {
       "localizations" : {
@@ -16577,6 +16650,9 @@
         }
       }
     },
+    "Pictures" : {
+
+    },
     "Pike your hips higher" : {
 
     },
@@ -16761,6 +16837,7 @@
       }
     },
     "Pose detection runs entirely on your iPhone. Video is never recorded or uploaded." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16817,6 +16894,9 @@
           }
         }
       }
+    },
+    "Pose detection runs entirely on your iPhone. Workout video is never recorded or uploaded." : {
+
     },
     "Pounds" : {
       "localizations" : {
@@ -17354,6 +17434,7 @@
 
     },
     "Profile" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17473,6 +17554,12 @@
       }
     },
     "Progress recounts your saved workouts and weigh-ins. A badge stays once you qualify, even if a streak breaks." : {
+
+    },
+    "Progress selfies stay on this iPhone. They are shared only if you make a video and send it yourself." : {
+
+    },
+    "Progress video" : {
 
     },
     "Progressive strength with perfect form" : {
@@ -19688,6 +19775,9 @@
         }
       }
     },
+    "See all badges" : {
+
+    },
     "Set" : {
 
     },
@@ -20149,6 +20239,15 @@
           }
         }
       }
+    },
+    "Settings" : {
+
+    },
+    "Share" : {
+
+    },
+    "Share a 10-second video?" : {
+
     },
     "sharp sessions" : {
 
@@ -21171,6 +21270,12 @@
       }
     },
     "Spotter calls each turn while this tab is open." : {
+
+    },
+    "Spotter can turn your pictures into a 10-second video with Week 1 to Week 5 slides and music, ready to send to friends." : {
+
+    },
+    "Spotter couldn't make the video. Try again." : {
 
     },
     "Spotter couldn't read your location." : {
@@ -23660,6 +23765,21 @@
     "Super Champ" : {
 
     },
+    "Take a selfie" : {
+
+    },
+    "Take a selfie to make a 10-second video." : {
+
+    },
+    "Take selfie" : {
+
+    },
+    "Take the picture that starts your 10-second before-and-after." : {
+
+    },
+    "Take your before selfie" : {
+
+    },
     "Talks you through every rep, so you never need to look at your phone." : {
       "localizations" : {
         "ar" : {
@@ -24492,6 +24612,9 @@
           }
         }
       }
+    },
+    "Time for a progress picture" : {
+
     },
     "Times your hold only while your body is in position." : {
       "localizations" : {
@@ -25684,6 +25807,7 @@
       }
     },
     "Unlock your full plan" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -25740,6 +25864,12 @@
           }
         }
       }
+    },
+    "Up next" : {
+
+    },
+    "Update 10-second video" : {
+
     },
     "Upgrade to Spotter Pro" : {
       "localizations" : {
@@ -26049,6 +26179,9 @@
         }
       }
     },
+    "Watch 10-second video" : {
+
+    },
     "Watching: %@" : {
 
     },
@@ -26171,13 +26304,20 @@
     "Week" : {
 
     },
+    "Week %lld" : {
+
+    },
     "Week Champ" : {
 
     },
     "Weekly" : {
 
     },
+    "Weekly progress picture" : {
+
+    },
     "Weigh in to track loss by week and by month." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26361,6 +26501,7 @@
 
     },
     "Weight, workouts and exercises" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27695,6 +27836,7 @@
       }
     },
     "Your progress lives here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

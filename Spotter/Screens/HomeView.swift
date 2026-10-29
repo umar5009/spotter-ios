@@ -63,7 +63,6 @@ struct HomeView: View {
                     header
                     quoteCard
                     todayCard
-                    if !store.isPro { upgradeCard }
                     programsRow
                     weekCard
                     quickStart
@@ -341,31 +340,6 @@ struct HomeView: View {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(cal.isDateInToday(day) && !selected ? Theme.accent : Color.clear, lineWidth: 1.5)
             )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var upgradeCard: some View {
-        Button {
-            SpotterAnalytics.click("open_paywall", screen: "today", ["source": "upgrade_card"])
-            router.showPaywall = true
-        } label: {
-            HStack(spacing: 14) {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.black)
-                    .frame(width: 44, height: 44)
-                    .background(Theme.violet, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Unlock your full plan").font(.display(16, weight: .bold)).foregroundStyle(.white)
-                    Text("6-Pack, weight loss, muscle, strength, glutes, and mobility").font(.subheadline).foregroundStyle(Theme.textSecondary)
-                }
-                Spacer()
-                Image(systemName: "chevron.right").foregroundStyle(Theme.textTertiary)
-            }
-            .padding(14)
-            .background(Theme.violet.opacity(0.12), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Theme.violet.opacity(0.35)))
         }
         .buttonStyle(.plain)
     }
