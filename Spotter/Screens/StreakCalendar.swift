@@ -209,15 +209,21 @@ enum StreakCalendar {
     }
 }
 
+private struct StreakGridWidth: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 struct StreakCalendarCard: View {
     let logs: [WorkoutLog]
     let sets: [SetLog]
     let weights: [WeightEntry]
 
     @State private var selected: StreakCalendar.Day?
+    @State private var gridWidth: CGFloat = 0
 
-    private let cell: CGFloat = 14
-    private let pitch: CGFloat = 18
     private let gap: CGFloat = 3
     private var columns: [StreakCalendar.Column] { StreakCalendar.columns(logs: logs, sets: sets) }
     private var streak: Int { Streak.current(from: logs.map(\.date)) }
@@ -242,46 +248,70 @@ struct StreakCalendarCard: View {
     }
 
     private var grid: some View {
-        let weekday = ["M", "", "W", "", "F", "", ""]
-        return ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: gap) {
-                    VStack(spacing: gap) {
-                        Color.clear.frame(width: 12, height: 12)
-                        ForEach(Array(weekday.enumerated()), id: \.offset) { _, label in
-                            Text(label)
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(Theme.textTertiary)
-                                .frame(width: 12, height: pitch)
+        GeometryReader { geo in
+            let layout = layout(for: geo.size.width)
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    columnsRow(pitch: layout.pitch, cell: layout.cell)
+                }
+                .onAppear {
+                    DispatchQueue.main.async {
+                        if let last = columns.last?.id {
+                            proxy.scrollTo(last, anchor: .trailing)
                         }
-                    }
-                    ForEach(columns) { column in
-                        VStack(spacing: gap) {
-                            Text(column.month ?? "")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(Theme.textTertiary)
-                                .lineLimit(1)
-                                .fixedSize(horizontal: true, vertical: false)
-                                .frame(width: pitch, height: 12, alignment: .leading)
-                            ForEach(column.days) { day in
-                                dayCell(day)
-                            }
-                        }
-                        .id(column.id)
                     }
                 }
             }
-            .onAppear {
-                DispatchQueue.main.async {
-                    if let last = columns.last?.id {
-                        proxy.scrollTo(last, anchor: .trailing)
+            .preference(key: StreakGridWidth.self, value: geo.size.width)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: calendarHeight)
+        .onPreferenceChange(StreakGridWidth.self) { gridWidth = $0 }
+    }
+
+    private var calendarHeight: CGFloat {
+        let square = gridWidth > 1 ? layout(for: gridWidth).pitch : 18
+        return 14 + gap + 7 * square
+    }
+
+    private func layout(for width: CGFloat) -> (pitch: CGFloat, cell: CGFloat) {
+        let weeks = CGFloat(max(columns.count, 1))
+        let available = width - 16 - gap * weeks
+        guard available > 0 else { return (18, 14) }
+        let next = min(44, max(18, floor(available / weeks)))
+        return (next, max(14, next - 4))
+    }
+
+    private func columnsRow(pitch: CGFloat, cell: CGFloat) -> some View {
+        let weekday = ["M", "", "W", "", "F", "", ""]
+        return HStack(alignment: .top, spacing: gap) {
+            VStack(spacing: gap) {
+                Color.clear.frame(width: 12, height: 14)
+                ForEach(Array(weekday.enumerated()), id: \.offset) { _, label in
+                    Text(label)
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(Theme.textTertiary)
+                        .frame(width: 12, height: pitch)
+                }
+            }
+            ForEach(columns) { column in
+                VStack(spacing: gap) {
+                    Text(column.month ?? " ")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Theme.textTertiary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                        .frame(width: pitch, height: 14, alignment: .leading)
+                    ForEach(column.days) { day in
+                        dayCell(day, pitch: pitch, cell: cell)
                     }
                 }
+                .id(column.id)
             }
         }
     }
 
-    private func dayCell(_ day: StreakCalendar.Day) -> some View {
+    private func dayCell(_ day: StreakCalendar.Day, pitch: CGFloat, cell: CGFloat) -> some View {
         let today = Calendar.current.isDateInToday(day.date)
         return Button {
             Haptics.tap()

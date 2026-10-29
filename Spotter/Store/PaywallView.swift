@@ -126,7 +126,7 @@ struct PaywallView: View {
 
     private func price(yearly: Bool) -> String {
         if let product = yearly ? store.yearly : store.monthly { return product.displayPrice }
-        return yearly ? "$39.99" : "$9.99"
+        return yearly ? "$39.99" : "$4.99"
     }
 
     private func perMonth() -> String {

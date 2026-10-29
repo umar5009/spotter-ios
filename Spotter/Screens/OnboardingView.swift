@@ -4,13 +4,11 @@ import AVFoundation
 struct OnboardingView: View {
     var onFinish: () -> Void
 
-    @AppStorage("goal") private var goalRaw = Goal.strength.rawValue
-    @AppStorage("place") private var placeRaw = TrainingPlace.home.rawValue
-    @AppStorage("level") private var levelRaw = Level.beginner.rawValue
     @State private var step = 0
     @State private var cameraGranted = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
 
-    private let lastStep = 6
+    /// Welcome, camera, then badges. Plan choices stay in Settings.
+    private let lastStep = 2
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,33 +30,8 @@ struct OnboardingView: View {
             Group {
                 switch step {
                 case 0: welcome
-                case 1: choice(title: "What's your main goal?", subtitle: "Spotter shapes your plan and coaching around it.") {
-                    ForEach(Goal.allCases) { g in
-                        SelectionRow(title: g.title, subtitle: g.subtitle, symbol: g.symbol, selected: goalRaw == g.rawValue) {
-                            SpotterAnalytics.click("onboarding_goal", screen: "onboarding", ["value": g.rawValue])
-                            goalRaw = g.rawValue
-                        }
-                    }
-                }
-                case 2: choice(title: "Where will you train?", subtitle: "Bodyweight at home, weights at the gym, or both.") {
-                    ForEach(TrainingPlace.allCases) { p in
-                        SelectionRow(title: p.title, subtitle: p.subtitle, symbol: p.symbol, selected: placeRaw == p.rawValue) {
-                            SpotterAnalytics.click("onboarding_place", screen: "onboarding", ["value": p.rawValue])
-                            placeRaw = p.rawValue
-                        }
-                    }
-                }
-                case 3: choice(title: "How experienced are you?", subtitle: "Be honest. Good form first, then load.") {
-                    ForEach(Level.allCases) { l in
-                        SelectionRow(title: l.title, subtitle: l.subtitle, symbol: "chart.bar.fill", selected: levelRaw == l.rawValue) {
-                            SpotterAnalytics.click("onboarding_level", screen: "onboarding", ["value": l.rawValue])
-                            levelRaw = l.rawValue
-                        }
-                    }
-                }
-                case 4: cameraStep
-                case 5: badgesStep
-                default: planReady
+                case 1: cameraStep
+                default: badgesStep
                 }
             }
             .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
@@ -78,16 +51,15 @@ struct OnboardingView: View {
     private var buttonTitle: String {
         switch step {
         case 0: return String(localized: "Get started")
-        case 4: return cameraGranted ? String(localized: "Continue") : String(localized: "Allow camera")
-        case lastStep: return String(localized: "Start my plan")
-        default: return String(localized: "Continue")
+        case 1: return cameraGranted ? String(localized: "Continue") : String(localized: "Allow camera")
+        default: return String(localized: "Go to Home")
         }
     }
 
     private func advance() {
         Haptics.tap()
         SpotterAnalytics.click("onboarding_continue", screen: "onboarding", ["step": step])
-        if step == 4 && !cameraGranted {
+        if step == 1 && !cameraGranted {
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.async {
                     cameraGranted = granted
@@ -124,17 +96,6 @@ struct OnboardingView: View {
         .padding(.horizontal, 20)
     }
 
-    private func choice<Content: View>(title: LocalizedStringKey, subtitle: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(title).font(.display(30, weight: .heavy)).foregroundStyle(.white).padding(.top, 24)
-                Text(subtitle).foregroundStyle(Theme.textSecondary).padding(.bottom, 10)
-                content()
-            }
-            .padding(.horizontal, 20)
-        }
-    }
-
     private var cameraStep: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text("How your AI coach sees you").font(.display(30, weight: .heavy)).foregroundStyle(.white).padding(.top, 24)
@@ -160,45 +121,6 @@ struct OnboardingView: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 12)
-        }
-    }
-
-    private var planReady: some View {
-        let plan = PlanBuilder.today(place: TrainingPlace(rawValue: placeRaw) ?? .home,
-                                     level: Level(rawValue: levelRaw) ?? .beginner,
-                                     goal: Goal(rawValue: goalRaw) ?? .strength,
-                                     isPro: true)
-        return ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Your plan is ready").eyebrow(Theme.accent).padding(.top, 24)
-                Text(plan.title).font(.display(32, weight: .heavy)).foregroundStyle(.white)
-                HStack(spacing: 8) {
-                    Pill(text: "\(plan.estimatedMinutes) min", symbol: "clock")
-                    Pill(text: "3× per week", symbol: "calendar")
-                    Pill(text: (Level(rawValue: levelRaw) ?? .beginner).title, symbol: "chart.bar.fill")
-                }
-                Card {
-                    VStack(spacing: 12) {
-                        ForEach(plan.items) { item in
-                            let spec = ExerciseLibrary.spec(item.exerciseID)
-                            HStack {
-                                Image(systemName: spec.symbol).foregroundStyle(Theme.accent).frame(width: 28)
-                                Text(spec.name).font(.display(16, weight: .semibold)).foregroundStyle(.white)
-                                Spacer()
-                                Text("\(item.sets) × \(item.target)\(spec.kind.isHold ? "s" : "")")
-                                    .font(.subheadline.monospacedDigit()).foregroundStyle(Theme.textSecondary)
-                            }
-                        }
-                    }
-                }
-                Text("Every session adapts: hit your reps with a form score above 85 and Spotter will suggest progressing.")
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.textSecondary)
-                Text("Live coaching is included on these exercises. 6-Pack, weight loss, and the other programs are part of Spotter Pro.")
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.textSecondary)
-            }
-            .padding(.horizontal, 20)
         }
     }
 

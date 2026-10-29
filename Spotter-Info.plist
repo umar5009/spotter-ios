@@ -6,6 +6,13 @@
 	<string>Spotter plays songs saved on this iPhone during a workout. An Apple Music subscription is not required.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Spotter uses your location while you use the app to find nearby gyms and draw a route.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict/>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

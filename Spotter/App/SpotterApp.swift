@@ -27,7 +27,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         supportedInterfaceOrientationsFor window: UIWindow?
     ) -> UIInterfaceOrientationMask {
-        Self.isDuo ? .allButUpsideDown : .portrait
+        if UIDevice.current.userInterfaceIdiom == .pad { return .all }
+        return Self.isDuo ? .allButUpsideDown : .portrait
     }
 
     /// Cover and inner displays on iPhone Duo (iPhone19,4). Other iPhones stay portrait.
@@ -77,6 +78,7 @@ struct SpotterApp: App {
                 .preferredColorScheme(.dark)
                 .tint(Theme.accent)
         }
+        .defaultSize(width: 1400, height: 2000)
         .modelContainer(for: [WorkoutLog.self, SetLog.self, WeightEntry.self])
     }
 }
@@ -106,6 +108,7 @@ struct RootView: View {
 
     var body: some View {
         ZStack {
+            Theme.bg.ignoresSafeArea()
             app
             if showLaunch {
                 LaunchSplash {
@@ -120,6 +123,11 @@ struct RootView: View {
             let name = names.indices.contains(new) ? names[new] : "today"
             SpotterAnalytics.click("tab", screen: "root", ["tab": name])
             logScreen()
+            if new == 3 {
+                refreshPhotoPrompt()
+            } else {
+                photos.hidePrompt()
+            }
         }
         .onChange(of: onboarded) { _, done in
             if done {
@@ -146,7 +154,7 @@ struct RootView: View {
     }
 
     private func refreshPhotoPrompt() {
-        guard onboarded, !showLaunch, router.activeWorkout == nil else { return }
+        guard onboarded, !showLaunch, router.activeWorkout == nil, tab == 3 else { return }
         photos.consider(paywallVisible: router.showPaywall)
     }
 
@@ -206,9 +214,6 @@ struct RootView: View {
                     ])
                     SpotterAnalytics.sync(isPro: store.isPro)
                     withAnimation(.easeInOut) { onboarded = true }
-                    if !store.isPro {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { router.showPaywall = true }
-                    }
                 }
             }
         }

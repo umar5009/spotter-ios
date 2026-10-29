@@ -3900,6 +3900,7 @@
       }
     },
     "Be honest. Good form first, then load." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4911,6 +4912,7 @@
       }
     },
     "Bodyweight at home, weights at the gym, or both." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7922,6 +7924,7 @@
 
     },
     "Every session adapts: hit your reps with a form score above 85 and Spotter will suggest progressing." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8521,6 +8524,9 @@
 
     },
     "Finish 5 coached workouts." : {
+
+    },
+    "Finish here" : {
 
     },
     "Finish set" : {
@@ -10126,6 +10132,9 @@
         }
       }
     },
+    "Go to Home" : {
+
+    },
     "Goal" : {
       "localizations" : {
         "ar" : {
@@ -11560,6 +11569,7 @@
       }
     },
     "How experienced are you?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12691,9 +12701,6 @@
     "Last time: %@." : {
 
     },
-    "Later" : {
-
-    },
     "Lateral Raise" : {
       "localizations" : {
         "ar" : {
@@ -13236,9 +13243,6 @@
           }
         }
       }
-    },
-    "Live coaching is included on these exercises. 6-Pack, weight loss, and the other programs are part of Spotter Pro." : {
-
     },
     "Load" : {
 
@@ -14495,9 +14499,6 @@
     "Make a U-turn onto %@" : {
 
     },
-    "Make video" : {
-
-    },
     "Making your 10-second video" : {
 
     },
@@ -15222,6 +15223,7 @@
       }
     },
     "Next: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15879,9 +15881,6 @@
           }
         }
       }
-    },
-    "Not now" : {
-
     },
     "Notifications" : {
       "localizations" : {
@@ -18809,6 +18808,9 @@
     "Reminder time" : {
 
     },
+    "Reminders" : {
+
+    },
     "Reminders and updates. Turn them off here, or in iOS Settings." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -21637,6 +21639,7 @@
       }
     },
     "Spotter shapes your plan and coaching around it." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22877,6 +22880,9 @@
         }
       }
     },
+    "Start %@?" : {
+
+    },
     "Start 7-day free trial" : {
       "localizations" : {
         "ar" : {
@@ -22936,6 +22942,7 @@
       }
     },
     "Start my plan" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22992,6 +22999,9 @@
           }
         }
       }
+    },
+    "Start next" : {
+
     },
     "Start program" : {
 
@@ -23769,9 +23779,6 @@
 
     },
     "Take a selfie to make a 10-second video." : {
-
-    },
-    "Take selfie" : {
 
     },
     "Take the picture that starts your 10-second before-and-after." : {
@@ -26618,6 +26625,7 @@
       }
     },
     "What's your main goal?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -26676,6 +26684,7 @@
       }
     },
     "Where will you train?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -27778,6 +27787,7 @@
       }
     },
     "Your plan is ready" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

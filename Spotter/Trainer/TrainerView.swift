@@ -574,17 +574,33 @@ struct ExerciseDoneCard: View {
                     .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
             }
-            Button {
-                SpotterAnalytics.click(session.nextSpec == nil ? "finish_workout" : "next_exercise", screen: "workout")
-                session.continueToNextExercise()
-            } label: {
-                if let next = session.nextSpec {
-                    Label("Next: \(next.name)", systemImage: "arrow.right")
-                } else {
+            if let next = session.nextSpec {
+                Text("Start \(next.name)?")
+                    .font(.display(17, weight: .semibold))
+                    .foregroundStyle(.white)
+                Button {
+                    SpotterAnalytics.click("next_exercise", screen: "workout")
+                    session.continueToNextExercise()
+                } label: {
+                    Label("Start next", systemImage: "arrow.right")
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                Button {
+                    SpotterAnalytics.click("finish_workout", screen: "workout", ["source": "after_exercise"])
+                    session.finish()
+                } label: {
+                    Label("Finish here", systemImage: "flag.checkered")
+                }
+                .buttonStyle(GlassButtonStyle())
+            } else {
+                Button {
+                    SpotterAnalytics.click("finish_workout", screen: "workout")
+                    session.continueToNextExercise()
+                } label: {
                     Label("Finish workout", systemImage: "flag.checkered")
                 }
+                .buttonStyle(PrimaryButtonStyle())
             }
-            .buttonStyle(PrimaryButtonStyle())
         }
         .padding(18)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))

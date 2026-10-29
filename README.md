@@ -12,7 +12,7 @@ Spotter watches you through the iPhone camera, tracks your body with Apple Visio
 
 ### Test subscriptions locally
 *Product → Scheme → Edit Scheme → Run → Options → StoreKit Configuration →* select `Spotter.storekit`.
-Products: `spotter.pro.yearly` ($39.99 with a 7-day free trial) and `spotter.pro.monthly` ($9.99).
+Products: `spotter.pro.yearly` ($39.99 with a 7-day free trial) and `spotter.pro.monthly` ($4.99).
 In Debug builds, Profile → Developer → "Unlock Pro (debug)" also works.
 
 ## What's inside

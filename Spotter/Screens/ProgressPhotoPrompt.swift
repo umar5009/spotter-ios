@@ -73,25 +73,13 @@ final class ProgressPhotoCenter: ObservableObject {
     init() { reload() }
 
     func consider(paywallVisible: Bool) {
-        guard !paywallVisible, prompt == nil, !showCamera, !showLibrary, shareFile == nil, !rendering else { return }
-        reload()
-        if shots.isEmpty && !ProgressAlbum.askedBefore {
-            prompt = .before
-            return
-        }
-        if ProgressAlbum.cadence == nil && ProgressAlbum.askedBefore {
-            prompt = .cadence
-            return
-        }
-        if ProgressAlbum.isDue(shots: shots) {
-            prompt = .progress
-        }
+        if paywallVisible { prompt = nil }
     }
 
-    /// Opened from the progress-picture notification.
+    /// Opened from the progress-picture notification. The pictures card is already on Progress.
     func presentFromNotification() {
         reload()
-        prompt = shots.isEmpty ? .before : .progress
+        prompt = nil
     }
 
     func beginCapture() {
@@ -120,6 +108,12 @@ final class ProgressPhotoCenter: ObservableObject {
         default:
             showLibrary = true
         }
+    }
+
+    /// Hides the ask without recording an answer, so it can return on Progress.
+    func hidePrompt() {
+        guard !showCamera, !showLibrary else { return }
+        prompt = nil
     }
 
     func declineBefore() {
@@ -161,29 +155,20 @@ final class ProgressPhotoCenter: ObservableObject {
         showLibrary = false
         pickerItem = nil
         Task { await ProgressPhotoReminder.reschedule() }
-        if ProgressAlbum.cadence == nil {
-            followUp = .cadence
-        } else if shots.count >= 1 && ProgressAlbum.videoAskedCount < shots.count {
-            followUp = .video
-        }
+        followUp = nil
+        prompt = nil
     }
 
     func cancelCapture() {
         showCamera = false
-        if ProgressAlbum.cadence == nil {
-            followUp = .cadence
-        }
+        followUp = nil
     }
 
     func captureSheetClosed() {
         guard !dismissHandled, !showCamera, !showLibrary else { return }
         dismissHandled = true
-        if followUp == nil, ProgressAlbum.cadence == nil, ProgressAlbum.askedBefore {
-            followUp = .cadence
-        }
-        guard let next = followUp else { return }
         followUp = nil
-        queue(next)
+        prompt = nil
     }
 
     func makeVideo() {
@@ -294,31 +279,6 @@ struct ProgressPhotoPrompt: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .alert(
-                photos.prompt?.title ?? "",
-                isPresented: Binding(
-                    get: { photos.prompt != nil },
-                    set: { if !$0 { photos.prompt = nil } }
-                ),
-                presenting: photos.prompt
-            ) { prompt in
-                switch prompt {
-                case .before:
-                    Button("Take selfie") { photos.beginCapture() }
-                    Button("Not now", role: .cancel) { photos.declineBefore() }
-                case .cadence:
-                    Button("Weekly") { photos.choose(.week) }
-                    Button("Monthly") { photos.choose(.month) }
-                case .progress:
-                    Button("Take selfie") { photos.beginCapture() }
-                    Button("Later", role: .cancel) { photos.snooze() }
-                case .video:
-                    Button("Make video") { photos.makeVideo() }
-                    Button("Not now", role: .cancel) { photos.declineVideo() }
-                }
-            } message: { prompt in
-                Text(prompt.message)
-            }
             .fullScreenCover(isPresented: $photos.showCamera, onDismiss: { photos.captureSheetClosed() }) {
                 SelfieCamera(
                     onCapture: { photos.save($0) },
@@ -417,6 +377,16 @@ struct ProgressPhotoStrip: View {
                         }
                     }
                 }
+                if ProgressAlbum.cadence == nil {
+                    HStack(spacing: 8) {
+                        Text("Reminders")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.textSecondary)
+                        Spacer(minLength: 8)
+                        reminderButton("Weekly") { photos.choose(.week) }
+                        reminderButton("Monthly") { photos.choose(.month) }
+                    }
+                }
                 Button {
                     photos.beginCapture()
                 } label: {
@@ -437,6 +407,15 @@ struct ProgressPhotoStrip: View {
                 }
             }
         }
+    }
+
+    private func reminderButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        Button(title, action: action)
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(.black)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(Theme.accent, in: Capsule())
     }
 
     private func thumb(_ image: UIImage?) -> some View {
