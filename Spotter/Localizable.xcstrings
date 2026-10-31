@@ -619,6 +619,26 @@
         }
       }
     },
+    "%@ × · %lld kcal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ × · %2$lld kcal"
+          }
+        }
+      }
+    },
+    "%@ × %@ · %lld kcal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ × %2$@ · %3$lld kcal"
+          }
+        }
+      }
+    },
     "%@ × %lld = %@" : {
       "localizations" : {
         "en" : {
@@ -788,6 +808,16 @@
     "%@ lost. That hits this week's target." : {
 
     },
+    "%@ meals for %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ meals for %2$@."
+          }
+        }
+      }
+    },
     "%@, %@" : {
       "localizations" : {
         "en" : {
@@ -950,6 +980,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld"
+          }
+        }
+      }
+    },
+    "%lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
+    "%lld / %lld g" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld g"
+          }
+        }
+      }
+    },
+    "%lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
           }
         }
       }
@@ -1197,6 +1257,19 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld 英尺 %2$lld 英寸"
+          }
+        }
+      }
+    },
+    "%lld kcal" : {
+
+    },
+    "%lld kcal a day across %lld logged days." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld kcal a day across %2$lld logged days."
           }
         }
       }
@@ -1773,6 +1846,9 @@
       }
     },
     "1 day" : {
+
+    },
+    "1 serving" : {
 
     },
     "1 workout" : {
@@ -2923,6 +2999,9 @@
         }
       }
     },
+    "A starter meal plan for your goal. Add the foods you actually buy." : {
+
+    },
     "Add a little, keep the form. That is the whole sport." : {
       "localizations" : {
         "ar" : {
@@ -2984,10 +3063,25 @@
     "Add a picture to your 10-second before-and-after." : {
 
     },
+    "Add a product" : {
+
+    },
+    "Add a product you eat. It can be anything, even if it is not in Spotter's list." : {
+
+    },
+    "Add calories for %@." : {
+
+    },
+    "Add food" : {
+
+    },
     "Add this month's picture to your 10-second before-and-after." : {
 
     },
     "Add this month's selfie to your 10-second progress video." : {
+
+    },
+    "Add this product" : {
 
     },
     "Add this week's picture to your 10-second before-and-after." : {
@@ -3407,6 +3501,12 @@
           }
         }
       }
+    },
+    "Answer" : {
+
+    },
+    "Anything you don't eat? Say none if the list above is fine." : {
+
     },
     "Arm day" : {
 
@@ -5260,6 +5360,9 @@
         }
       }
     },
+    "Breakfast" : {
+
+    },
     "Breathe out as you reach the hard part. Don't hold the air hostage." : {
       "localizations" : {
         "ar" : {
@@ -5437,6 +5540,12 @@
     "Build Muscle" : {
 
     },
+    "Build my own meals" : {
+
+    },
+    "Built from the foods you named. Portions are a starting point." : {
+
+    },
     "By exercise" : {
       "localizations" : {
         "ar" : {
@@ -5494,6 +5603,18 @@
           }
         }
       }
+    },
+    "Calorie and macro targets" : {
+
+    },
+    "Calorie target %lld kcal." : {
+
+    },
+    "Calories" : {
+
+    },
+    "Calories not set" : {
+
     },
     "Camera access needed" : {
       "localizations" : {
@@ -5669,6 +5790,12 @@
         }
       }
     },
+    "Carbs" : {
+
+    },
+    "Carbs g" : {
+
+    },
     "Celebrate" : {
 
     },
@@ -5797,6 +5924,12 @@
     "Chest stays toward the floor" : {
 
     },
+    "Choose 2, 3, 4, or 5 days." : {
+
+    },
+    "Choose Get stronger, Lose fat, Easier joints, or Short sessions." : {
+
+    },
     "Choose kilograms or pounds, and centimetres or feet and inches. BMI uses the same numbers either way. Healthy for most adults is 18.5–24.9." : {
       "localizations" : {
         "ar" : {
@@ -5854,6 +5987,9 @@
           }
         }
       }
+    },
+    "Choose my own" : {
+
     },
     "Choose weekly or monthly pictures so you can see your progress, then turn them into a video for friends." : {
 
@@ -6584,8 +6720,21 @@
     "Curls, dips, and a press." : {
 
     },
+    "Custom food" : {
+
+    },
     "Daily" : {
 
+    },
+    "Daily average this week · %lld g protein · target %lld kcal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Daily average this week · %1$lld g protein · target %2$lld kcal"
+          }
+        }
+      }
     },
     "Date" : {
       "localizations" : {
@@ -6771,6 +6920,9 @@
 
     },
     "Demonstration of %@" : {
+
+    },
+    "Dinner" : {
 
     },
     "Directions" : {
@@ -7499,6 +7651,9 @@
     "Earned" : {
 
     },
+    "Easier joints" : {
+
+    },
     "Easy core and glutes. Keep the streak without grinding." : {
       "localizations" : {
         "ar" : {
@@ -7561,6 +7716,9 @@
 
     },
     "Easy on purpose." : {
+
+    },
+    "Edit" : {
 
     },
     "Edit target" : {
@@ -7920,6 +8078,9 @@
         }
       }
     },
+    "Enter an age from 13 to 90." : {
+
+    },
     "Enter how much to lose, or leave it blank." : {
 
     },
@@ -8156,6 +8317,9 @@
         }
       }
     },
+    "Exercises saved: %@.\n\nUse the meals I suggested, build your own, or keep the meals you already have?" : {
+
+    },
     "Extra variations for size, at home or with weights." : {
 
     },
@@ -8216,6 +8380,12 @@
           }
         }
       }
+    },
+    "Fat" : {
+
+    },
+    "Fat g" : {
+
     },
     "Fat loss is a weekly trend, not a number you punish yourself with each morning." : {
       "localizations" : {
@@ -8941,6 +9111,15 @@
           }
         }
       }
+    },
+    "Food" : {
+
+    },
+    "Foods" : {
+
+    },
+    "Foods you added." : {
+
     },
     "Forearms" : {
       "localizations" : {
@@ -11627,7 +11806,13 @@
         }
       }
     },
+    "How many days can you train this week?" : {
+
+    },
     "How often should Spotter ask?" : {
+
+    },
+    "How old are you?" : {
 
     },
     "How to do it" : {
@@ -11749,6 +11934,24 @@
         }
       }
     },
+    "I couldn't place those foods. Add them yourself on Meals." : {
+
+    },
+    "I have your age as %lld." : {
+
+    },
+    "I kept the exercises to squats, hinges, and pushes you can do with control." : {
+
+    },
+    "I need an age of 13 or older before I can build a plan." : {
+
+    },
+    "I'll ask a few questions, then put exercises on Today and a meal plan on Meals.%@ This is a training aid, not medical advice." : {
+
+    },
+    "I'll leave your workout as it is.\n\nUse the meals I suggested, build your own, or keep the meals you already have?" : {
+
+    },
     "If the form breaks, the set is over. That's discipline, not quitting." : {
       "localizations" : {
         "ar" : {
@@ -11806,6 +12009,9 @@
           }
         }
       }
+    },
+    "If you saved foods, they are on the Meals tab. The workout choice is on Today." : {
+
     },
     "in" : {
       "localizations" : {
@@ -12163,6 +12369,12 @@
           }
         }
       }
+    },
+    "Keep my current meals" : {
+
+    },
+    "Keep my workout" : {
+
     },
     "Keep the bar close to your legs" : {
 
@@ -12582,6 +12794,9 @@
         }
       }
     },
+    "Last 7 days" : {
+
+    },
     "Last one" : {
       "localizations" : {
         "ar" : {
@@ -12819,6 +13034,9 @@
           }
         }
       }
+    },
+    "left" : {
+
     },
     "Leg day" : {
 
@@ -13366,6 +13584,12 @@
         }
       }
     },
+    "Log a meal to see your average." : {
+
+    },
+    "Log custom food" : {
+
+    },
     "Log the weigh-in and get on with the day. One reading is not a verdict." : {
       "localizations" : {
         "ar" : {
@@ -13540,10 +13764,16 @@
         }
       }
     },
+    "Logged" : {
+
+    },
     "Lose each month" : {
 
     },
     "Lose each week" : {
+
+    },
+    "Lose fat" : {
 
     },
     "Lose fat, keep muscle" : {
@@ -13722,6 +13952,9 @@
           }
         }
       }
+    },
+    "Lower body" : {
+
     },
     "Lower Body" : {
       "localizations" : {
@@ -14428,6 +14661,9 @@
         }
       }
     },
+    "Lunch" : {
+
+    },
     "Lunges and squats for the legs." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -14490,6 +14726,9 @@
     "Lunges, a step-up, and a bridge." : {
 
     },
+    "Macros" : {
+
+    },
     "Make a 10-second video" : {
 
     },
@@ -14500,6 +14739,18 @@
 
     },
     "Making your 10-second video" : {
+
+    },
+    "Meal" : {
+
+    },
+    "Meal plan" : {
+
+    },
+    "Meals" : {
+
+    },
+    "Meals are on the Meals tab. You can still edit any product there." : {
 
     },
     "Membership" : {
@@ -15092,6 +15343,15 @@
 
     },
     "Music by Kevin MacLeod (incompetech.com), CC BY 4.0." : {
+
+    },
+    "My meal plan" : {
+
+    },
+    "Name" : {
+
+    },
+    "Name a few foods, or say you pick." : {
 
     },
     "Nearby gyms" : {
@@ -15824,6 +16084,9 @@
         }
       }
     },
+    "None" : {
+
+    },
     "Not enough weigh-ins" : {
       "localizations" : {
         "ar" : {
@@ -15881,6 +16144,9 @@
           }
         }
       }
+    },
+    "Nothing logged for this day. Add a food, or log a meal from the plan below." : {
+
     },
     "Notifications" : {
       "localizations" : {
@@ -16350,6 +16616,9 @@
         }
       }
     },
+    "over" : {
+
+    },
     "Over" : {
       "localizations" : {
         "ar" : {
@@ -16649,6 +16918,9 @@
         }
       }
     },
+    "Pick an exercise plan. I'll ask about meals after that." : {
+
+    },
     "Pictures" : {
 
     },
@@ -16712,6 +16984,9 @@
           }
         }
       }
+    },
+    "Plan name" : {
+
     },
     "Plank" : {
       "localizations" : {
@@ -17734,6 +18009,12 @@
           }
         }
       }
+    },
+    "Protein" : {
+
+    },
+    "Protein g" : {
+
     },
     "Pull" : {
 
@@ -19716,7 +19997,16 @@
     "Saved on this iPhone" : {
 
     },
+    "Saved products" : {
+
+    },
+    "Saved. Today's exercises are on the Today tab, and the meals are on Meals." : {
+
+    },
     "Score 85 or higher on 5 workouts." : {
+
+    },
+    "Search" : {
 
     },
     "Seconds" : {
@@ -19778,6 +20068,12 @@
       }
     },
     "See all badges" : {
+
+    },
+    "Serving" : {
+
+    },
+    "Servings %@" : {
 
     },
     "Set" : {
@@ -20255,6 +20551,9 @@
 
     },
     "Short circuits that keep you moving." : {
+
+    },
+    "Short sessions" : {
 
     },
     "Short sessions you'll actually do" : {
@@ -21085,6 +21384,9 @@
         }
       }
     },
+    "Snack" : {
+
+    },
     "Soften the knees. This is a hinge, not a squat" : {
 
     },
@@ -21464,6 +21766,9 @@
         }
       }
     },
+    "Spotter foods" : {
+
+    },
     "Spotter is a training aid, not medical advice. Stop if you feel pain and talk to a professional about injuries." : {
       "localizations" : {
         "ar" : {
@@ -21521,6 +21826,9 @@
           }
         }
       }
+    },
+    "Spotter is for people 13 and older." : {
+
     },
     "Spotter Pro" : {
       "localizations" : {
@@ -22941,6 +23249,9 @@
         }
       }
     },
+    "Start from the suggestion" : {
+
+    },
     "Start my plan" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -23179,6 +23490,9 @@
           }
         }
       }
+    },
+    "Started from the suggestion. Add or remove products." : {
+
     },
     "Stay hinged. Chest toward the floor" : {
 
@@ -23772,6 +24086,9 @@
         }
       }
     },
+    "Suggested from your goal and latest weigh-in. Saving here keeps your numbers until you reset." : {
+
+    },
     "Super Champ" : {
 
     },
@@ -23844,6 +24161,9 @@
           }
         }
       }
+    },
+    "Targets" : {
+
     },
     "Ten minutes done beats an hour you keep rescheduling." : {
       "localizations" : {
@@ -24137,6 +24457,9 @@
           }
         }
       }
+    },
+    "The Meals tab uses these numbers. Leave them on the suggestion and they follow your goal and latest weigh-in." : {
+
     },
     "the road" : {
 
@@ -24735,6 +25058,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天"
+          }
+        }
+      }
+    },
+    "Today: %@. I set %lld training days, starting today." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Today: %1$@. I set %2$lld training days, starting today."
           }
         }
       }
@@ -25581,6 +25914,9 @@
         }
       }
     },
+    "Under 18, the plan stays at maintenance instead of a fat-loss deficit." : {
+
+    },
     "Under your range" : {
       "localizations" : {
         "ar" : {
@@ -26056,6 +26392,21 @@
       }
     },
     "Use the scheduled plan" : {
+
+    },
+    "Use the suggested plan" : {
+
+    },
+    "Use the suggested target" : {
+
+    },
+    "Use these meals" : {
+
+    },
+    "Use this exercise and meal plan, or pick your own?" : {
+
+    },
+    "Use this plan" : {
 
     },
     "Voice coaching" : {
@@ -26566,6 +26917,12 @@
         }
       }
     },
+    "What do you want from training right now?" : {
+
+    },
+    "What do you weigh, in %@?" : {
+
+    },
     "What your AI coach watches" : {
       "localizations" : {
         "ar" : {
@@ -26741,6 +27098,9 @@
           }
         }
       }
+    },
+    "Which foods do you already have? Separate them with commas. Say anything if you want me to pick." : {
+
     },
     "White tick is your goal" : {
       "localizations" : {
@@ -27471,6 +27831,9 @@
     "You have arrived at the gym" : {
 
     },
+    "You pick" : {
+
+    },
     "You reached %@ %@. The badge stays on your home screen." : {
       "localizations" : {
         "en" : {
@@ -27661,6 +28024,9 @@
         }
       }
     },
+    "Your foods" : {
+
+    },
     "Your goal of %@ %@ is below that healthy range." : {
       "localizations" : {
         "ar" : {
@@ -27725,7 +28091,20 @@
         }
       }
     },
+    "Your latest weigh-in is %@ %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your latest weigh-in is %1$@ %2$@."
+          }
+        }
+      }
+    },
     "Your location stays on the map while this tab is open." : {
+
+    },
+    "Your meals stay as they are. The workout choice is on Today." : {
 
     },
     "Your plan" : {
@@ -27786,6 +28165,9 @@
         }
       }
     },
+    "Your plan · ready to start" : {
+
+    },
     "Your plan is ready" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -27844,6 +28226,9 @@
           }
         }
       }
+    },
+    "Your product" : {
+
     },
     "Your progress lives here" : {
       "extractionState" : "stale",

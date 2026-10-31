@@ -77,17 +77,27 @@ enum DayPlanEdit {
     static func save(_ ids: [String], on day: Date, calendar: Calendar = .current) {
         UserDefaults.standard.set(ids, forKey: key(for: day, calendar: calendar))
         Task { await DayReminder.reschedule() }
+        Task { @MainActor in DayPlanStore.shared.noteChange() }
     }
 
     static func clear(on day: Date, calendar: Calendar = .current) {
         UserDefaults.standard.removeObject(forKey: key(for: day, calendar: calendar))
         Task { await DayReminder.reschedule() }
+        Task { @MainActor in DayPlanStore.shared.noteChange() }
     }
 
     private static func key(for day: Date, calendar: Calendar) -> String {
         let start = calendar.startOfDay(for: day)
         return "planEdit.\(Int(start.timeIntervalSince1970))"
     }
+}
+
+@MainActor
+final class DayPlanStore: ObservableObject {
+    static let shared = DayPlanStore()
+    @Published private(set) var revision = 0
+    func noteChange() { revision += 1 }
+    private init() {}
 }
 
 /// A repeating weekday focus, such as chest day or leg day.

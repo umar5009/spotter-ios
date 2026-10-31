@@ -11,6 +11,7 @@ struct HomeView: View {
     @AppStorage("weightUnit") private var weightUnitRaw = Measure.Weight.kilograms.rawValue
     @Query(sort: \WorkoutLog.date, order: .reverse) private var logs: [WorkoutLog]
     @ObservedObject private var weekSplit = WeekSplitStore.shared
+    @ObservedObject private var dayPlans = DayPlanStore.shared
     @State private var selectedDay = Calendar.current.startOfDay(for: .now)
     @State private var swapIndex: Int?
     @State private var showWeekPlan = false
@@ -31,10 +32,9 @@ struct HomeView: View {
     }
 
     private var plan: WorkoutPlan {
+        let _ = dayPlans.revision
         let scheduled = scheduledPlan
-        let base = weekSplit.focus(on: activeDay) == nil
-            ? PlanBuilder.applying(DayPlanEdit.ids(on: activeDay), onto: scheduled, level: level, goal: goal, isPro: store.isPro)
-            : scheduled
+        let base = PlanBuilder.applying(DayPlanEdit.ids(on: activeDay), onto: scheduled, level: level, goal: goal, isPro: store.isPro)
         var workout = base
         workout.items = LiftLoad.applying(to: workout.items)
         return workout
@@ -45,8 +45,18 @@ struct HomeView: View {
     }
 
     private var weekDates: [Date] {
+        let _ = dayPlans.revision
+        let calendar = Calendar.current
         let start = PlanBuilder.startOfWeek()
-        return (0..<7).compactMap { Calendar.current.date(byAdding: .day, value: $0, to: start) }
+        var days = (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
+        let today = calendar.startOfDay(for: .now)
+        for offset in 0..<7 {
+            guard let day = calendar.date(byAdding: .day, value: offset, to: today) else { continue }
+            guard DayPlanEdit.ids(on: day) != nil else { continue }
+            if days.contains(where: { calendar.isDate($0, inSameDayAs: day) }) { continue }
+            days.append(calendar.startOfDay(for: day))
+        }
+        return days.sorted()
     }
 
     private var trainedDays: Set<Date> {
@@ -207,6 +217,11 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(sessionHeadline).font(.display(28, weight: .heavy)).foregroundStyle(.white)
                 Text(plan.focus).font(.subheadline).foregroundStyle(Theme.textSecondary)
+                if DayPlanEdit.ids(on: activeDay) != nil {
+                    Text("Your plan · ready to start")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Theme.accent)
+                }
             }
             VStack(spacing: 8) {
                 ForEach(Array(plan.items.enumerated()), id: \.offset) { index, item in
@@ -263,7 +278,7 @@ struct HomeView: View {
                     }
                 }
             }
-            if DayPlanEdit.ids(on: activeDay) != nil, weekSplit.focus(on: activeDay) == nil {
+            if DayPlanEdit.ids(on: activeDay) != nil {
                 Button("Use the scheduled plan") {
                     SpotterAnalytics.click("reset_plan_day", screen: "today")
                     DayPlanEdit.clear(on: activeDay)

@@ -50,6 +50,7 @@ struct ProgressScreen: View {
                 VStack(alignment: .leading, spacing: 16) {
                     BadgeBoardView(logs: logs, weights: weights)
                     StreaksView()
+                    NutritionWeekCard()
                     ProgressPhotoStrip()
                     if !logs.isEmpty {
                         HStack(spacing: 10) {

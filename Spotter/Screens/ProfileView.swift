@@ -76,6 +76,16 @@ struct ProfileView: View {
                 }
 
                 Section {
+                    NavigationLink {
+                        NutritionTargetsView()
+                    } label: {
+                        Label("Calorie and macro targets", systemImage: "fork.knife")
+                    }
+                } header: { Text("Meals") } footer: {
+                    Text("The Meals tab uses these numbers. Leave them on the suggestion and they follow your goal and latest weigh-in.")
+                }
+
+                Section {
                     Picker("Weight", selection: $weightUnitRaw) {
                         ForEach(Measure.Weight.allCases) { Text($0.title).tag($0.rawValue) }
                     }

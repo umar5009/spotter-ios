@@ -79,7 +79,7 @@ struct SpotterApp: App {
                 .tint(Theme.accent)
         }
         .defaultSize(width: 1400, height: 2000)
-        .modelContainer(for: [WorkoutLog.self, SetLog.self, WeightEntry.self])
+        .modelContainer(for: [WorkoutLog.self, SetLog.self, WeightEntry.self, MealEntry.self])
     }
 }
 
@@ -103,6 +103,7 @@ struct RootView: View {
     @EnvironmentObject private var store: StoreManager
     @State private var tab = 0
     @State private var showLaunch = true
+    @State private var showCoach = false
     @StateObject private var photos = ProgressPhotoCenter()
     @ObservedObject private var push = PushManager.shared
 
@@ -117,11 +118,23 @@ struct RootView: View {
                 }
                     .zIndex(1)
             }
+            if onboarded, !showLaunch, router.activeWorkout == nil, !router.showPaywall, !showCoach {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        SiriOrbButton {
+                            SpotterAnalytics.click("open_coach", screen: "root")
+                            showCoach = true
+                        }
+                    }
+                }
+                .padding(.trailing, 18)
+                .padding(.bottom, UIDevice.current.userInterfaceIdiom == .pad ? 24 : 88)
+            }
         }
         .onChange(of: tab) { _, new in
-            let names = ["today", "exercises", "gyms", "progress", "settings"]
-            let name = names.indices.contains(new) ? names[new] : "today"
-            SpotterAnalytics.click("tab", screen: "root", ["tab": name])
+            SpotterAnalytics.click("tab", screen: "root", ["tab": tabName(new)])
             logScreen()
             if new == 3 {
                 refreshPhotoPrompt()
@@ -163,8 +176,19 @@ struct RootView: View {
             SpotterAnalytics.screen("onboarding")
             return
         }
-        let names = ["today", "exercises", "gyms", "progress", "settings"]
-        SpotterAnalytics.screen(names.indices.contains(tab) ? names[tab] : "today")
+        SpotterAnalytics.screen(tabName(tab))
+    }
+
+    private func tabName(_ tab: Int) -> String {
+        switch tab {
+        case 0: return "today"
+        case 1: return "exercises"
+        case 2: return "gyms"
+        case 3: return "progress"
+        case 4: return "settings"
+        case 5: return "meals"
+        default: return "today"
+        }
     }
 
     private func open(_ route: String) {
@@ -174,6 +198,7 @@ struct RootView: View {
         case "gyms": tab = 2
         case "streaks", "progress": tab = 3
         case "profile", "settings": tab = 4
+        case "meals", "nutrition": tab = 5
         case "progressPhoto":
             tab = 3
             photos.presentFromNotification()
@@ -201,9 +226,16 @@ struct RootView: View {
                     ProgressScreen()
                         .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
                         .tag(3)
+                    NutritionView()
+                        .tabItem { Label("Meals", systemImage: "fork.knife") }
+                        .tag(5)
                     ProfileView()
                         .tabItem { Label("Settings", systemImage: "gearshape.fill") }
                         .tag(4)
+                }
+                .sheet(isPresented: $showCoach) {
+                    CoachChatView()
+                        .environmentObject(store)
                 }
             } else {
                 OnboardingView {
